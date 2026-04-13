@@ -5,9 +5,9 @@ import LoginPage from './pages/Login'
 import DashboardPage from './pages/Dashboard'
 import RegisterPage from './pages/Register'
 import BookPage from'./pages/BookPage'
-import CreeatSlotPage from './owner/CreateSlot'
-import OwnerDashboard from './owner/OwnerDashboard'
-import SlotDetail from './owner/SlotDetail'
+import CreateSlotPage from './pages/owner/CreateSlot'
+import OwnerDashboard from './pages/owner/OwnerDashboard'
+import SlotDetail from './pages/owner/SlotDetail'
 
 
 
