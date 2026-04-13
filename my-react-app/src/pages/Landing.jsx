@@ -1,6 +1,6 @@
 function LandingPage({onLogin, onRegister}){
     return(
-        <> 
+       
         <div className="registerOrLogin">
             {/*ROUGH NAVBAR TO UPDATE IF NEEDED*/}
             <nav className="navbar">
@@ -44,7 +44,7 @@ function LandingPage({onLogin, onRegister}){
                 </div>
             </div>
         </section>
-
+      
 
 
         {/*Footer*/}
@@ -52,7 +52,7 @@ function LandingPage({onLogin, onRegister}){
             <p>McGill University — SOCS Booking App</p>
         </footer>
         </div>
-        </>
+        
 
     )
 
