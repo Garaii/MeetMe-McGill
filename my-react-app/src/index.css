@@ -109,3 +109,25 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+
+
+.navbar {
+  border: 2px solid red;
+}
+
+.app_description {
+  border: 2px solid blue;
+}
+
+.how-it-works {
+  border: 2px solid green;
+}
+
+.footer {
+  border: 2px solid orange;
+}
+
+.cards {
+  border: 2px solid purple;
+}
