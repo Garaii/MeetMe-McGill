@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar'
 
 function LoginPage({onLogin, onGoRegister}) {
   return (
-    <div><Navbar onLogin={null} onRegister={onRegister} />
+    <div><Navbar onLogin={null} onRegister={onGoRegister} />
     <div className="auth-page">
        
       <div className="auth-card">
