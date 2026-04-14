@@ -6,8 +6,8 @@ function LandingPage({onLogin, onRegister}){
             <nav className="navbar">
                 <span className='nav-logo'>Meet Me @ McGill</span>
                 <div className="nav-links">
-                <button onClick={onLogin}>Login</button>
-                <button onClick={onRegister} className="btn-primary">Register</button>
+                <button onClick={onGoLogin}>Login</button>
+                <button onClick={onGoRegister} className="btn-primary">Register</button>
                 </div>
             </nav>
 

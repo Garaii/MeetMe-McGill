@@ -6,8 +6,8 @@ function RegisterPage({onRegistered, onGoLogin}) {
             <nav className="navbar">
                 <span className='nav-logo'>Meet Me @ McGill</span>
                 <div className="nav-links">
-                    <button onClick={onLogin}>Login</button>
-                    <button onClick={onRegistered} className="btn-primary">Register</button>
+                    <button onClick={onGoLogin}>Login</button>
+                    <button onClick={onGoLogin} className="btn-primary">Register</button>
                 </div>
             </nav>
       <div className="auth-card">
