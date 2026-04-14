@@ -40,11 +40,7 @@ function LandingPage({onLogin, onRegister}){
                 </div>
             </div>
         </section>
-        <div>
-      <h1>hello</h1>  {/* even just this to test */}
-    </div>
-
-
+    
         {/*Footer*/}
         <footer className="footer">
             <p>McGill University — SOCS Booking App</p>
