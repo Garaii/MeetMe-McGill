@@ -58,5 +58,5 @@ function LandingPage({onLogin, onRegister}){
 
     )
 
-
 }
+export default LandingPage
