@@ -2,14 +2,7 @@
 function LoginPage({onLogin, onGoRegister}) {
   return (
     <div className="auth-page">
-        {/*ROUGH NAVBAR TO UPDATE IF NEEDED*/}
-            <nav className="navbar">
-                <span className='nav-logo'>Meet Me @ McGill</span>
-                <div className="nav-links">
-                    <button onClick={onLogin}>Login</button>
-                    <button onClick={onRegister} className="btn-primary">Register</button>
-                </div>
-            </nav>
+
       <div className="auth-card">
         <h2>Welcome back</h2>
         <p className="auth-subtitle">Login with your McGill email</p>
