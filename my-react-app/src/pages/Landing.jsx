@@ -1,17 +1,11 @@
 import Navbar from '../components/Navbar'
 function LandingPage({onLogin, onRegister}){
     return(
-       <div>
-        <Navbar onLogin={onLogin} onRegister={onRegister} />  
+       <div className="landing">
+
+      <Navbar onLogin={onLogin} onRegister={onRegister} />
         <div className="registerOrLogin">
-            {/*ROUGH NAVBAR TO UPDATE IF NEEDED*/}
-            <nav className="navbar">
-                <span className='nav-logo'>Meet Me @ McGill</span>
-                <div className="nav-links">
-                <button onClick={onLogin}>Login</button>
-                <button onClick={onRegister} className="btn-primary">Register</button>
-        </div>
-            </nav>
+           
 
         {/*Description */}
         <section className = "app_description">
@@ -56,8 +50,7 @@ function LandingPage({onLogin, onRegister}){
             <p>McGill University — SOCS Booking App</p>
         </footer>
         </div>
-    </div>
-        
+        </div>
 
     )
 
