@@ -2,9 +2,9 @@
 import Navbar from '../components/Navbar'
 function RegisterPage({onRegistered, onGoLogin}) {
   return (   
- 
+ <div><Navbar onLogin={onGoLogin} onRegister={null} />
   <div className="auth-page">
-        <Navbar onLogin={onGoLogin} onRegister={null} />
+        
 
       <div className="auth-card">
         <h2>Create an account</h2>
@@ -35,6 +35,8 @@ function RegisterPage({onRegistered, onGoLogin}) {
         </p>
       </div>
 
-    </div>)
+    </div>
+    </div>
+    )
 }
 export default RegisterPage
