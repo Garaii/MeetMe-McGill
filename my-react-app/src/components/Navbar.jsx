@@ -1,5 +1,5 @@
 // navbar.jsx
-function Navbar() {
+function Navbar({ onLogin, onRegister }) {
   return (
     <nav className="navbar">
       <span className="nav-logo">Meet Me @ McGill</span>
