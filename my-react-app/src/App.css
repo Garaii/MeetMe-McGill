@@ -136,6 +136,28 @@
     }
   }
 
+
+
+.navbar {
+  border: 2px solid red;
+}
+
+.app_description {
+  border: 2px solid blue;
+}
+
+.how-it-works {
+  border: 2px solid green;
+}
+
+.footer {
+  border: 2px solid orange;
+}
+
+.cards {
+  border: 2px solid purple;
+}
+  /*-----------------------------------------------------------------------------------------*/
   @media (max-width: 1024px) {
     margin-top: 20px;
     flex-wrap: wrap;
