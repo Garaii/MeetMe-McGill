@@ -7,7 +7,7 @@ function LandingPage({onLogin, onRegister}){
                 <span className='nav-logo'>Meet Me @ McGill</span>
                 <div className="nav-links">
                 <button onClick={onGoLogin}>Login</button>
-                <button onClick={onGoRegister} className="btn-primary">Register</button>
+                <button onClick={onGoLogin} className="btn-primary">Register</button>
                 </div>
             </nav>
 
