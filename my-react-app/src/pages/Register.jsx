@@ -1,7 +1,10 @@
 // Register.jsx
+import Navbar from '../components/Navbar'
 function RegisterPage({onRegistered, onGoLogin}) {
-  return (    
-  <div className="auth-page">
+  return (   
+    <div>
+      <Navbar onLogin={onLogin} onRegister={onRegister} />
+    <div className="auth-page">
         {/*ROUGH NAVBAR TO UPDATE IF NEEDED*/}
             <nav className="navbar">
                 <span className='nav-logo'>Meet Me @ McGill</span>
@@ -39,6 +42,8 @@ function RegisterPage({onRegistered, onGoLogin}) {
         </p>
       </div>
 
-    </div>)
+    </div>
+    </div>
+    )
 }
 export default RegisterPage

@@ -1,6 +1,8 @@
+import Navbar from '../components/Navbar'
 function LandingPage({onLogin, onRegister}){
     return(
-       
+       <div>
+        <Navbar onLogin={onLogin} onRegister={onRegister} />  
         <div className="registerOrLogin">
             {/*ROUGH NAVBAR TO UPDATE IF NEEDED*/}
             <nav className="navbar">
@@ -54,6 +56,7 @@ function LandingPage({onLogin, onRegister}){
             <p>McGill University — SOCS Booking App</p>
         </footer>
         </div>
+    </div>
         
 
     )
