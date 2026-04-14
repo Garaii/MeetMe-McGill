@@ -4,7 +4,7 @@ function LandingPage({onLogin, onRegister}){
        <div className="landing">
 
       <Navbar onLogin={onLogin} onRegister={onRegister} />
-        <div className="registerOrLogin">
+       
            
 
         {/*Description */}
@@ -50,7 +50,7 @@ function LandingPage({onLogin, onRegister}){
             <p>McGill University — SOCS Booking App</p>
         </footer>
         </div>
-        </div>
+     
 
     )
 
