@@ -1,15 +1,13 @@
 // Register.jsx
 function RegisterPage({onRegistered, onGoLogin}) {
   return (    
-  
-   
   <div className="auth-page">
         {/*ROUGH NAVBAR TO UPDATE IF NEEDED*/}
             <nav className="navbar">
                 <span className='nav-logo'>Meet Me @ McGill</span>
                 <div className="nav-links">
-                    <button onClick={onLogin}>Login</button>
-                    <button onClick={onRegister} className="btn-primary">Register</button>
+                    <button onClick={onGoLogin}>Login</button>
+                    <button onClick={onGoRegister} className="btn-primary">Register</button>
                 </div>
             </nav>
       <div className="auth-card">
