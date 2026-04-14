@@ -8,7 +8,7 @@ function LandingPage({onLogin, onRegister}){
                 <div className="nav-links">
                 <button onClick={onLogin}>Login</button>
                 <button onClick={onRegister} className="btn-primary">Register</button>
-                </div>
+        </div>
             </nav>
 
         {/*Description */}
@@ -44,7 +44,9 @@ function LandingPage({onLogin, onRegister}){
                 </div>
             </div>
         </section>
-      
+        <div>
+      <h1>hello</h1>  {/* even just this to test */}
+    </div>
 
 
         {/*Footer*/}
