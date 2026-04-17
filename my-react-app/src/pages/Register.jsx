@@ -12,7 +12,22 @@ function RegisterPage({onRegistered, onGoLogin}) {
 
         <div className="auth-form">
           <div className="form-group">
-            <label>Email</label>
+            <label>First Name</label>
+            <input type="fname" placeholder="First Name" />
+          </div>
+
+          <div className="form-group">
+            <label>Last Name</label>
+            <input type="lname" placeholder="Last Name" />
+          </div>
+
+          <div className="form-group">
+            <label>McGill ID</label>
+            <input type="numID" placeholder="270000000"/>
+          </div>
+
+          <div className="form-group">
+            <label>McGill Email</label>
             <input type="email" placeholder="you@mail.mcgill.ca" />
           </div>
 
