@@ -11,14 +11,17 @@ function RegisterPage({onRegistered, onGoLogin}) {
         <p className="auth-subtitle">Only McGill emails are allowed</p>
 
         <div className="auth-form">
-          <div className="form-group">
-            <label>First Name</label>
-            <input type="fname" placeholder="First Name" />
-          </div>
 
-          <div className="form-group">
-            <label>Last Name</label>
-            <input type="lname" placeholder="Last Name" />
+          <div className='form-row'>
+            <div className="form-group">
+              <label>First Name</label>
+              <input type="fname" placeholder="First Name" />
+            </div>
+
+            <div className="form-group">
+              <label>Last Name</label>
+              <input type="lname" placeholder="Last Name" />
+            </div>
           </div>
 
           <div className="form-group">

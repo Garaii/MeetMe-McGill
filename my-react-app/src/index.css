@@ -210,6 +210,11 @@ code {
   gap: 6px;
 }
 
+.form-row {
+  display: flex;
+  gap: 18px;
+}
+
 .form-group label {
   font-size: 14px;
   font-weight: 500;
