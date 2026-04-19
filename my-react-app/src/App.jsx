@@ -32,7 +32,7 @@ function App() {
   {/*just to visualise dashboard for changes then uncomment the line above to restore*/}
   const [page, setPage] = useState("dashboard")
 
-  const[user, setUser] = useState(null)
+ 
   
   //first just handling is the user is an owner or student
   function handleLogin(userData) {
