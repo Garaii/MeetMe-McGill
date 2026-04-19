@@ -199,7 +199,7 @@ code {
 }
 
 .browse-tab-btn, .appt-tab-btn{
-  background-color: white;
+  background-color: rgb(240, 143, 143);
   color: #cc0000;
   border: none;
   padding: 10px 20px;
