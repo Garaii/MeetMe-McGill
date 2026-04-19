@@ -191,6 +191,12 @@ code {
   padding: 24px;
   margin-bottom: 24px;
 }
+
+.dashboard-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
 /* ============================================================== REGISTRATION PAGE ==============================================*/
 
 .auth-page {
