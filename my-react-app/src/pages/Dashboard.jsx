@@ -1,10 +1,10 @@
 // Dashboard.jsx
-function DashboardPage() {
+function DashboardPage({user, onLogout, onBook}) {
   return (
   <div>
-    
-    <div className="form-group">
-    <h2>DashBoard</h2>
+    <Navbar onLogout={onLogout} user={user} />
+    <div className="dashboard">
+    <h1>Welcome back, {user.name}! </h1>
     {/*LISTING TO SEE @MCGILL.CA WHO HAVE ACTIVE SLOTS
     * SELECT OWNER THEN SEE THEIR AVAILABLE SLOTS
     * AS A USER YOU CAN BOOK A SLOT
@@ -22,12 +22,21 @@ function DashboardPage() {
     * 
     * 
     */}
-    <p>WEEK </p>
+    {/*MY APPOINTMENTS*/}
+    <section className="Appointments">
+      <h2>My Appointments</h2>
+      {/* appointment block with mailto owner of slot
+          Delete
+
+          THIS IS FOR EXISTING APPOINTMENTS
+      */}
+    </section>
+    {/* APPOINTMENT ACTIONS*/}
+    <div className="dashboard-actions">
+      <button onClick={onBook} className="btn-primary">BOOK AN APPOINTMENT</button>
+      <button onClick={onLogout}>Logout</button>
     </div>
-    
-    
-    Dashboard Page
-  
+    </div>
   </div>
     
   )

@@ -231,7 +231,7 @@ code {
 .form-group input:focus {
   border-color: #888;
 }
-
+/*++++++++++++++++++++++++++++++++++++======================= THIS IS THE RED BUTTON YOU SEE EVERYWHERE, ONCE YOU CHANGE THE STYLE OF IT, IT CHANGES EVERYWHERE!!!!!=================================+++++++++++++++++++++++++ */
 .btn-primary {
   background-color: #cc0000;
   color: white;
