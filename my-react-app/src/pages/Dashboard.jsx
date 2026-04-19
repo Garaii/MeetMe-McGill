@@ -25,7 +25,7 @@ function DashboardPage({user, onLogout, onBook}) {
     * 
     */}
     {/*MY APPOINTMENTS*/}
-    <section className="Appointments">
+    <section className="appointments">
       <h2>My Appointments</h2>
       {/* appointment block with mailto owner of slot
           Delete
