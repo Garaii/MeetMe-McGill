@@ -203,6 +203,7 @@ code {
   color: #cc0000;
   border: none;
   padding: 10px 20px;
+  border-color: #cc0000;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
