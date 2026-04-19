@@ -20,8 +20,15 @@ function LoginPage({onLogin, onGoRegister}) {
             <label>Password</label>
             <input type="password" placeholder="Password" />
           </div>
-
-          <button className="btn-primary btn-full">Login</button>
+          
+          {/* TO REPLACE WITH REAL CALL TO PHP FETCH */}
+          <button className="btn-primary btn-full" onClick={()=> onLogin({ 
+            name: "Kevin", 
+            email: "tame.impala@mail.mcgill.ca", 
+            role: "student" 
+          })}>
+            Login
+          </button>
         </div>
 
         <p className="auth-switch">

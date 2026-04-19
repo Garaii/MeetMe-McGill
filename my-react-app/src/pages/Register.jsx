@@ -43,8 +43,14 @@ function RegisterPage({onRegistered, onGoLogin}) {
             <label>Confirm Password</label>
             <input type="password" placeholder="Confirm password" />
           </div>
-
-          <button className="btn-primary btn-full">Register</button>
+           {/* TO REPLACE WITH REAL CALL TO PHP FETCH */}
+          <button className="btn-primary btn-full" onClick={()=> onRegistered({ 
+            name: "Kevin", 
+            email: "tame.impala@mail.mcgill.ca", 
+            role: "student" 
+          })}>
+            Register
+          </button>
         </div>
 
         <p className="auth-switch">
