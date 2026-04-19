@@ -197,6 +197,16 @@ code {
   gap: 12px;
   margin-top: 24px;
 }
+
+.browse-tab-btn, .appt-tab-btn{
+  background-color: white;
+  color: #cc0000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
 /* ============================================================== REGISTRATION PAGE ==============================================*/
 
 .auth-page {

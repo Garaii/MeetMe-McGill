@@ -30,8 +30,8 @@ function DashboardPage({user, onLogout, onBook}) {
     {/* INSTEAD OF HAVING DIFFERENT PAGES WILL HAVE TABLES INSIDE OF DASHBOARD*/}
                       {/*MY APPOINTMENTS*/}
     <div className="dashboard-tabs">
-      <button onClick={() => setView("appointments")}>My Appointments</button>
-      <button onClick={() => setView("browse")}>Browse Owners</button>
+      <button className="appt-tab-btn" onClick={() => setView("appointments")}>My Appointments</button>
+      <button className="browse-tab-btn" onClick={() => setView("browse")}>Browse Owners</button>
     </div>
      
       {view === "appointments" && (
