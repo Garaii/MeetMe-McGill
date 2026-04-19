@@ -180,7 +180,7 @@ code {
   min-height: 100vh;
 }
 
-.auth-card .dashboard{
+.auth-card, .dashboard{
   width: 100%;
   max-width: 400px;
   padding: 40px;
