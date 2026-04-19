@@ -26,11 +26,11 @@ function App() {
     role: "student" 
   })
 
-  {/*}
+ 
   const [page, setPage] = useState("landing")
-  */}
+  
   {/*just to visualise dashboard for changes then uncomment the line above to restore*/}
-  const [page, setPage] = useState("dashboard")
+   {/*}const [page, setPage] = useState("dashboard")*/}
 
  
   
