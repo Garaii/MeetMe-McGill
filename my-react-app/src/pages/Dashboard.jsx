@@ -1,3 +1,5 @@
+import Navbar from '../components/Navbar'
+
 // Dashboard.jsx
 function DashboardPage({user, onLogout, onBook}) {
   return (
