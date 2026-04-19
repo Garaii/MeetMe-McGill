@@ -24,15 +24,49 @@ function DashboardPage({user, onLogout, onBook}) {
     * 
     * 
     */}
-    {/*MY APPOINTMENTS*/}
-    <section className="appointments">
-      <h2>My Appointments</h2>
-      {/* appointment block with mailto owner of slot
-          Delete
+    {/* INSTEAD OF HAVING DIFFERENT PAGES WILL HAVE TABLES INSIDE OF DASHBOARD*/}
+                      {/*MY APPOINTMENTS*/}
+    <div className="dashboard-tabs">
+      <button onClick={() => setView("appointments")}>My Appointments</button>
+      <button onClick={() => setView("browse")}>Browse Owners</button>
+    </div>
+     
+      {view === "appointments" && (
+        <section className='appointments-view'>
+          <h2>My Appointments</h2>
+           
+          {/* appointment block with
+              ACTIONS: 
+              - mailto owner of slot
+              - Delete
+              DETAILS: TIMES, DATE, OWNER NAME, 2 BUTTONS FROM THE ACTIONS ABOVE
+              THIS IS FOR EXISTING APPOINTMENTS, HAVE TO MAP THEM TO BACK END
+          */}
 
-          THIS IS FOR EXISTING APPOINTMENTS
-      */}
-    </section>
+          <p> NO APPOINTMENTS.</p>
+        </section>
+      )}
+
+      {/* NEW APPOINTMENTS */}
+      {view === "browse" && (
+          <section className="browse-view">
+            <h2>Browse Owners</h2>
+            {/* fetch list of @mcgill.ca owners with active slots */}
+            {/* DISPLAY AS ROW OR CARDS: owner name, num slots, button to view their slots */}
+            <p>No owners available.</p>
+          </section>
+        )}
+
+        {view === "book" && selectedOwner && (
+          <section className="book-view">
+            <h2>Book a slot with {selectedOwner.name}</h2>
+            <button onClick={() => setView("browse")}>← Back to browse</button>
+            {/* fetch active slots for this owner FROM BACKEND */}
+            {/* each slot: date, time, type, book button */}
+          </section>
+        )}
+
+   
     {/* APPOINTMENT ACTIONS*/}
     <div className="dashboard-actions">
       <button onClick={onBook} className="btn-primary">BOOK AN APPOINTMENT</button>
