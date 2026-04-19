@@ -179,11 +179,12 @@ code {
   align-items: center;
   min-height: 100vh;
 }
-.dashboard{
+.dashboard {
   display: flex;
   justify-content: center;
-  align-items: center;
+  
   min-height: 100vh;
+  max-width: 650px;
   width: 100%;
   border: 1px solid #ccc;
   border-radius: 12px;
