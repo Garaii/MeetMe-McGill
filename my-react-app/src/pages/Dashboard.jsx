@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import Navbar from '../components/Navbar'
 
 // Dashboard.jsx
 function DashboardPage({user, onLogout, onBook}) {
+  const [view, setView] = useState("appointments")
+  const [selectedOwner, setSelectedOwner] = useState(null)
   return (
   <div>
     <Navbar onLogout={onLogout} user={user} />
@@ -55,16 +58,16 @@ function DashboardPage({user, onLogout, onBook}) {
             {/* DISPLAY AS ROW OR CARDS: owner name, num slots, button to view their slots */}
             <p>No owners available.</p>
           </section>
-        )}
+      )}
 
-        {view === "book" && selectedOwner && (
-          <section className="book-view">
-            <h2>Book a slot with {selectedOwner.name}</h2>
-            <button onClick={() => setView("browse")}>← Back to browse</button>
-            {/* fetch active slots for this owner FROM BACKEND */}
-            {/* each slot: date, time, type, book button */}
-          </section>
-        )}
+      {view === "book" && selectedOwner && (
+        <section className="book-view">
+          <h2>Book a slot with {selectedOwner.name}</h2>
+          <button onClick={() => setView("browse")}>← Back to browse</button>
+          {/* fetch active slots for this owner FROM BACKEND */}
+          {/* each slot: date, time, type, book button */}
+        </section>
+      )}
 
    
     {/* APPOINTMENT ACTIONS*/}
