@@ -173,14 +173,10 @@ code {
 /*================================================== dashboard styling ===========================================================*/
 
 .dashboard {
-  display: flex;
-  
-  align-items: center;
-  /*    up to delete if not work    */
   padding: 40px;
   max-width: 800px;
   margin: 0 auto;
-  /*width: 100%;*/
+  width: 100%;
 }
 
 .dashboard-tabs {
