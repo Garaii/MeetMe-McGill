@@ -303,6 +303,7 @@ function OwnerDashboard({ user, onLogout }) {
 
         {/* ── CREATE SLOT ── */}
         {view === "create_slot" && (
+          <div className="auth-page">
           <section className="auth-card">
             <h2>Create a Slot</h2>
 
@@ -328,10 +329,12 @@ function OwnerDashboard({ user, onLogout }) {
               </button>
             </div>
           </section>
+          </div>
         )}
 
-        {/* ── CREATE GROUP MEETING ── */}
+        {/* ################## CREATE GROUP MEETING ################### */}
         {view === "create_group" && (
+          <div className='auth-page'>
           <section className="auth-card">
             <h2>Create Group Meeting</h2>
 
@@ -382,12 +385,14 @@ function OwnerDashboard({ user, onLogout }) {
               </button>
             </div>
           </section>
+          </div>
         )}
 
-        {/* BOTTOM ACTIONS */}
+        {/* BOTTOM ACTIONS  $$$$$$$$$$$$$$$$$$$$$$$$$$ maybe put this button elsewhere $$$$$$$$$$$$$$$$$$$$$$$$$$$$ */}
         <div className="dashboard-actions">
           <button onClick={onLogout}>Logout</button>
         </div>
+
       </div>
     </div>
   )
