@@ -9,7 +9,7 @@ function OwnerDashboard({ user, onLogout }) {
   // Slots state
   const [slots, setSlots] = useState([])
   const [slotsLoading, setSlotsLoading] = useState(true)
-
+ 
   // Requests state
   const [requests, setRequests] = useState([])
   const [requestsLoaded, setRequestsLoaded] = useState(false)
