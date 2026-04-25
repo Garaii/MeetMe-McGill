@@ -1,7 +1,7 @@
 /* ********************************************************************************************************* */
 // OwnerDashboard.jsx
 import { useState, useEffect } from 'react'
-import Navbar from '../components/Navbar'
+import Navbar from '../../components/Navbar'
 
 function OwnerDashboard({ user, onLogout }) {
   const [view, setView] = useState("slots")
