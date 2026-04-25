@@ -47,7 +47,7 @@ function RegisterPage({onRegistered, onGoLogin}) {
           <button className="btn-primary btn-full" onClick={()=> onRegistered({ 
             name: "Kevin", 
             email: "tame.impala@mail.mcgill.ca", 
-            role: "student" 
+            role: "owner" 
           })}>
             Register
           </button>

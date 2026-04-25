@@ -25,7 +25,7 @@ function LoginPage({onLogin, onGoRegister}) {
           <button className="btn-primary btn-full" onClick={()=> onLogin({ 
             name: "Kevin", 
             email: "tame.impala@mail.mcgill.ca", 
-            role: "student" 
+            role: "owner" 
           })}>
             Login
           </button>
