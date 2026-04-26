@@ -4,8 +4,8 @@ import Navbar from '../components/Navbar'
 function LoginPage({onLogin, onGoRegister}) {
   return (
     <div><Navbar onLogin={null} onRegister={onGoRegister} />
-    <div className="auth-page">
-      <div className='auth-box'>  
+    <div className='auth-box'>
+      <div className="auth-page">  
         <div className="auth-card">
           <h2>Welcome back</h2>
           <p className="auth-subtitle">Login with your McGill email</p>

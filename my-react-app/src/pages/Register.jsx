@@ -4,8 +4,8 @@ function RegisterPage({onRegistered, onGoLogin}) {
   return (   
 <div>
   <Navbar onLogin={onGoLogin} onRegister={null} />
-  <div className="auth-page">
-    <div className='auth-box'> 
+  <div className='auth-box'>
+    <div className="auth-page">
     
       <div className="auth-card">
         <h2>Create an account</h2>
