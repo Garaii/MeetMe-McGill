@@ -240,7 +240,6 @@ code {
 
 .auth-form {
   display: flex;
-  min-width: 80%;
   flex-direction: column;
   gap: 16px;
 }
