@@ -157,7 +157,7 @@ code {
 
 .cards {
   flex: 1;
-  max-width: 280px;
+  max-width: 400px;/*280*/
   padding: 24px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -222,7 +222,7 @@ code {
 
 .auth-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;/*400*/
   padding: 40px;
   border: 1px solid #ccc;
   border-radius: 12px;
