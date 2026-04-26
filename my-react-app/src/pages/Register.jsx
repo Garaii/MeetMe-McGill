@@ -2,10 +2,11 @@
 import Navbar from '../components/Navbar'
 function RegisterPage({onRegistered, onGoLogin}) {
   return (   
- <div><Navbar onLogin={onGoLogin} onRegister={null} />
+<div>
+  <Navbar onLogin={onGoLogin} onRegister={null} />
   <div className="auth-page">
-        
-
+    <div className='auth-box'> 
+    
       <div className="auth-card">
         <h2>Create an account</h2>
         <p className="auth-subtitle">Only McGill emails are allowed</p>
@@ -58,9 +59,9 @@ function RegisterPage({onRegistered, onGoLogin}) {
           <span onClick={onGoLogin} className="auth-link">Login here</span>
         </p>
       </div>
-
-    </div>
-    </div>
+    </div>  
+  </div>
+</div>
     )
 }
 export default RegisterPage
