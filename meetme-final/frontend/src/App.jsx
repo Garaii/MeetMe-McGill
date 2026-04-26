@@ -1,0 +1,147 @@
+import { useState, useEffect } from "react"
+import './App.css'
+
+import LandingPage from './pages/Landing'
+import LoginPage from './pages/Login'
+import DashboardPage from './pages/Dashboard'
+import RegisterPage from './pages/Register'
+import BookPage from './pages/BookPage'
+import CreateSlotPage from './pages/owner/CreateSlot'
+import OwnerDashboard from './pages/owner/OwnerDashboard'
+import SlotDetail from './pages/owner/SlotDetail'
+
+import { apiGet, apiPost } from './api'
+
+function App() {
+  const [user, setUser] = useState(null)
+  const [page, setPage] = useState("landing")
+  const [checkingSession, setCheckingSession] = useState(true)
+
+  // check if PHP already has a logged-in session
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const result = await apiGet("auth.php")
+
+        if (result.logged_in && result.user) {
+          setUser(result.user)
+
+          if (result.user.role === "owner") {
+            setPage("ownerDashboard")
+          } else {
+            setPage("dashboard")
+          }
+        }
+      } catch (error) {
+        setUser(null)
+        setPage("landing")
+      } finally {
+        setCheckingSession(false)
+      }
+    }
+
+    checkSession()
+  }, [])
+
+  // first just handling if the user is an owner or student
+  function handleLogin(userData) {
+    setUser(userData)
+
+    // redirect based on role after login
+    if (userData.role === "owner") {
+      setPage("ownerDashboard")
+    } else {
+      setPage("dashboard")
+    }
+  }
+
+  async function handleLogout() {
+    try {
+      await apiPost("logout.php")
+    } catch (error) {
+      // still clear the frontend even if the request fails
+    }
+
+    setUser(null)
+    setPage("landing")
+  }
+
+  if (checkingSession) {
+    return (
+      <div className="app_shell">
+        <div className="auth-page">
+          <div className="auth-card">
+            <p>Loading MeetMe@McGill...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className="app_shell">
+        {page === "landing" && (
+          <LandingPage
+            onLogin={() => setPage("login")}
+            onRegister={() => setPage("register")}
+          />
+        )}
+
+        {page === "login" && (
+          <LoginPage
+            onLogin={handleLogin}
+            onGoRegister={() => setPage("register")}
+          />
+        )}
+
+        {page === "register" && (
+          <RegisterPage
+            onRegistered={handleLogin}
+            onGoLogin={() => setPage("login")}
+          />
+        )}
+
+        {page === "dashboard" && user && (
+          <DashboardPage
+            user={user}
+            onLogout={handleLogout}
+            onBook={() => setPage("book")}
+          />
+        )}
+
+        {page === "book" && user && (
+          <BookPage
+            user={user}
+            onBack={() => setPage("dashboard")}
+          />
+        )}
+
+        {page === "ownerDashboard" && user && (
+          <OwnerDashboard
+            user={user}
+            onLogout={handleLogout}
+            onCreateSlot={() => setPage("createSlot")}
+            onViewSlot={() => setPage("slotDetail")}
+          />
+        )}
+
+        {page === "createSlot" && user && (
+          <CreateSlotPage
+            user={user}
+            onBack={() => setPage("ownerDashboard")}
+          />
+        )}
+
+        {page === "slotDetail" && user && (
+          <SlotDetail
+            user={user}
+            onBack={() => setPage("ownerDashboard")}
+          />
+        )}
+      </div>
+    </>
+  )
+}
+
+export default App
