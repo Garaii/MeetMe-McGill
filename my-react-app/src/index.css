@@ -209,7 +209,7 @@ code {
 }
 /* ============================================================== REGISTRATION PAGE ==============================================*/
  
-.auth-page, .auth-box {
+.auth-page  {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -220,7 +220,7 @@ code {
 }
 
 
-.auth-card {
+.auth-card, .auth-box {
   width: 100%;
   max-width: 400px;
   padding: 40px;
