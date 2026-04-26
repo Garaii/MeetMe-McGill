@@ -189,7 +189,7 @@ code {
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 24px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .dashboard-actions {
@@ -213,7 +213,7 @@ code {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  /*min-height: 100vh;*/
 }
 
 
