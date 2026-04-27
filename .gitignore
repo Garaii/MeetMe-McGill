@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+frontend/node_modules/
+meetme-final/frontend/node_modules/
+
+# build output
+dist/
+frontend/dist/
+meetme-final/frontend/dist/
+
+# local database files
+*.sqlite
+*.sqlite3
+data/*.sqlite
+api/*.sqlite
+
+# system files
+.DS_Store
+
+# environment files
+.env
+.env.local
