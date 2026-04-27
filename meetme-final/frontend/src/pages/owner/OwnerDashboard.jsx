@@ -2,6 +2,7 @@
 // OwnerDashboard.jsx
 import { useState, useEffect } from 'react'
 import Navbar from '../../components/Navbar'
+import {apiGet, apiPost} from '../../../../api'
 
 function OwnerDashboard({ user, onLogout }) {
   const [view, setView] = useState("slots")
@@ -33,84 +34,79 @@ function OwnerDashboard({ user, onLogout }) {
   const [meetingSuccess, setMeetingSuccess] = useState('')
   const [meetingLoading, setMeetingLoading] = useState(false)
 
-  // Fetch slots from php on mount
+  // ======================= Fetch slots from php on mount
   useEffect(() => {
-    fetch('./php/owner_slots.php')
-      .then(res => res.json())
+    apiGet('owner_slots.php')
+      
       .then(data => {
-        if (data.success) setSlots(data.slots)
+        setSlots(data.slots || [])
         setSlotsLoading(false)
       })
       .catch(() => setSlotsLoading(false))
   }, [])
 
-  //Fetch requests (only when tab opened) 
+  // ======================== Fetch requests (only when tab opened) 
   const fetchRequests = () => {
     if (requestsLoaded) return
-    fetch('./php/owner_requests.php')
-      .then(res => res.json())
+    apiGet('owner_requests.php')
+      
       .then(data => {
-        if (data.success) {
-          setRequests(data.requests)
-          setRequestsLoaded(true)
-        }
+        setRequests(data.requests || [])
+        setRequestsLoaded(true)
+        
       })
   }
 
   // Toggle slot active / private 
   const handleToggleVisibility = async (slot_id, current_status) => {
-    const res = await fetch('./php/update_slot_visibility.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slot_id, is_active: current_status ? 0 : 1 })
+    try{ /*WILL HAVE TO UPDATE ENDPOINT NAME WHEN PHP PAGE BELOW IS DONE */
+      await apiPost("update_slot_availability.php",{
+      slot_id,
+      is_active: current_status ? 0: 1
     })
-    const data = await res.json()
-    if (data.success) {
+    
       setSlots(prev =>
         prev.map(s => s.id === slot_id ? { ...s, is_active: current_status ? 0 : 1 } : s)
       )
+    } catch (err){
+      alert(err.message)
     }
+    
   }
 
   // Delete slot , transforming into json
   const handleDeleteSlot = async (slot_id) => {
     if (!window.confirm('Delete this slot?')) return
-    const res = await fetch('./php/delete_slot.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slot_id })
-    })
-    const data = await res.json()
-    if (data.success) setSlots(prev => prev.filter(s => s.id !== slot_id))
+    try{ //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
+      await apiPost("delete_slot.php", {slot_id})
+      setSlots(prev => prev.filter(s => s.id !== slot_id))
+    } catch(err){
+      alert(err.message)
+    } 
   }
 
   // Accept request again transform into json for react
   const handleAcceptRequest = async (request_id) => {
-    const res = await fetch('./php/accept_request.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ request_id })
-    })
-    const data = await res.json()
-    if (data.success) {
+    try{ //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
+      await apiPost("accept_request.php", {request_id})
+    
       setRequests(prev =>
         prev.map(r => r.id === request_id ? { ...r, status: 'accepted' } : r)
       )
+    } catch(err) {
+      alert(err.message)
     }
   }
 
   // Decline request 
   const handleDeclineRequest = async (request_id) => {
-    const res = await fetch('./php/decline_request.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ request_id })
-    })
-    const data = await res.json()
-    if (data.success) {
+    try { //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
+      await apiPost("decline_request.php", {request_id})
       setRequests(prev =>
         prev.map(r => r.id === request_id ? { ...r, status: 'declined' } : r)
       )
+    } catch(err){
+      alert(err.message)
     }
   }
 
@@ -120,26 +116,22 @@ function OwnerDashboard({ user, onLogout }) {
     setSlotSuccess('')
     setSlotLoading(true)
 
-    const res = await fetch('./php/create_slot.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slot_date: slotDate, start_time: startTime, end_time: endTime })
-    })
-    const data = await res.json()
-
-    if (data.success) {
+    try{
+      const data = await apiPost("create_slot.php", {
+        slot_date: slotDate,
+        start_time: startTime,
+        end_time: endTime
+      })
       setSlotSuccess(data.message)
       setSlotDate('')
       setStartTime('')
       setEndTime('')
       // Refresh slots list
-      fetch('./php/owner_slots.php')
-        .then(r => r.json())
-        .then(d => { if (d.success) setSlots(d.slots) })
-    } else {
-      setSlotError(data.message)
-    }
-    setSlotLoading(false)
+      apiGet("owner_slots.php").then( d=> setSlots(d.slots || []))
+    }catch(err) {
+      setSlotError(err.message)
+    } finally{
+    setSlotLoading(false)}
   }
 
   //  Group meeting option helpers transforming to php -> json -> react
@@ -163,29 +155,24 @@ function OwnerDashboard({ user, onLogout }) {
     setMeetingSuccess('')
     setMeetingLoading(true)
 
-    const res = await fetch('./php/create_group_meeting.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: meetingTitle,
-        description: meetingDescription,
-        options: meetingOptions
-      })
-    })
-    const data = await res.json()
-
-    if (data.success) {
-      setMeetingSuccess(data.message)
-      setMeetingTitle('')
-      setMeetingDescription('')
-      setMeetingOptions([
-        { option_date: '', start_time: '', end_time: '' },
-        { option_date: '', start_time: '', end_time: '' },
-      ])
-    } else {
-      setMeetingError(data.message)
-    }
-    setMeetingLoading(false)
+    try{
+        const data = await apiPost("create_group_meeting.php", {
+          title: meetingTitle,
+          description: meetingDescription,
+          options: meetingOptions
+        })
+        setMeetingSuccess(data.message)
+        setMeetingTitle('')
+        setMeetingDescription('')
+        setMeetingOptions([
+          { option_date: '', start_time: '', end_time: '' },
+          { option_date: '', start_time: '', end_time: '' },
+        ])
+      } catch(err) {
+        setMeetingError(err.message)
+      } finally {
+        setMeetingLoading(false)
+      }
   }
 
   // actual UI 
@@ -211,7 +198,7 @@ function OwnerDashboard({ user, onLogout }) {
           </button>
         </div>
 
-        {/* ── MY SLOTS ── */}
+        {/* == MY SLOTS == */}
         {view === "slots" && (
           <section className="appointments-view">
             <h2>My Slots</h2>
