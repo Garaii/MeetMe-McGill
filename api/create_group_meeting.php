@@ -1,6 +1,5 @@
 <?php
-require_once "db.php";
-require_once "helpers.php";
+require_once "bootstrap.php";
 require_once "auth.php";
 
 require_owner();
@@ -12,36 +11,71 @@ $owner_id = current_user_id();
 $error = "";
 $success = "";
 
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+    // get existing group meetings for this owner
+
+    $db = get_db();
+    // connect to database
+
+    $stmt = $db->prepare("
+        SELECT id, title, description, status, created_at
+        FROM group_meetings
+        WHERE owner_id = ?
+        ORDER BY created_at DESC
+    ");
+
+    $stmt->execute([$owner_id]);
+    // run query
+
+    $meetings = $stmt->fetchAll();
+    // get query result
+
+    send_json([
+        "success" => true,
+        "meetings" => $meetings
+    ]);
+    // send meetings back to React
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // only run when form is submitted
 
-    $title = trim($_POST["title"] ?? "");
+    $data = read_json();
+    // read JSON data sent by React
+
+    $title = trim($data["title"] ?? "");
     // get group meeting title
 
-    $description = trim($_POST["description"] ?? "");
+    $description = trim($data["description"] ?? "");
     // get optional description
 
-    $dates = $_POST["option_date"] ?? [];
-    // get all submitted dates as an array
-
-    $start_times = $_POST["start_time"] ?? [];
-    // get all submitted start times as an array
-
-    $end_times = $_POST["end_time"] ?? [];
-    // get all submitted end times as an array
+    $options = $data["options"] ?? [];
+    // get all submitted options as an array
 
     if ($title === "") {
         $error = "Meeting title is required.";
-    } elseif (count($dates) === 0) {
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 400);
+
+    } elseif (!is_array($options) || count($options) === 0) {
         $error = "At least one meeting option is required.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 400);
+
     } else {
         $valid_options = [];
         // store valid options after checking them
 
-        for ($i = 0; $i < count($dates); $i++) {
-            $option_date = trim($dates[$i] ?? "");
-            $start_time = trim($start_times[$i] ?? "");
-            $end_time = trim($end_times[$i] ?? "");
+        foreach ($options as $option) {
+            $option_date = trim($option["option_date"] ?? "");
+            $start_time = trim($option["start_time"] ?? "");
+            $end_time = trim($option["end_time"] ?? "");
 
             // skip completely empty rows
             if ($option_date === "" && $start_time === "" && $end_time === "") {
@@ -59,141 +93,98 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
 
             $valid_options[] = [
-                "option_date" => $option_date,
-                "start_time" => $start_time,
-                "end_time" => $end_time
+                "start_time" => $option_date . " " . $start_time . ":00",
+                "end_time" => $option_date . " " . $end_time . ":00"
             ];
+            // combine date and time for SQLite
         }
 
-        if ($error === "" && count($valid_options) === 0) {
+        if ($error !== "") {
+            send_json([
+                "success" => false,
+                "message" => $error
+            ], 400);
+        }
+
+        if (count($valid_options) === 0) {
             $error = "Please provide at least one valid meeting option.";
+
+            send_json([
+                "success" => false,
+                "message" => $error
+            ], 400);
         }
 
-        if ($error === "") {
+        $db = get_db();
+        // connect to database
+
+        try {
+            $db->beginTransaction();
+            // start transaction so meeting and options are created together
+
             // insert group meeting first
-            $meeting_stmt = $conn->prepare("
+            $meeting_stmt = $db->prepare("
                 INSERT INTO group_meetings (owner_id, title, description)
                 VALUES (?, ?, ?)
             ");
-            $meeting_stmt->bind_param("iss", $owner_id, $title, $description);
 
-            if ($meeting_stmt->execute()) {
-                $group_meeting_id = $meeting_stmt->insert_id;
-                // get newly created group meeting ID
+            $meeting_stmt->execute([$owner_id, $title, $description]);
+            // run insert query
 
-                $meeting_stmt->close();
+            $group_meeting_id = $db->lastInsertId();
+            // get newly created group meeting ID
 
-                // insert each meeting option
-                $option_stmt = $conn->prepare("
-                    INSERT INTO group_meeting_options (group_meeting_id, option_date, start_time, end_time)
-                    VALUES (?, ?, ?, ?)
-                ");
+            // insert each meeting option
+            $option_stmt = $db->prepare("
+                INSERT INTO group_options (group_id, start_time, end_time)
+                VALUES (?, ?, ?)
+            ");
 
-                $created_count = 0;
+            $created_count = 0;
 
-                foreach ($valid_options as $option) {
-                    $option_stmt->bind_param(
-                        "isss",
-                        $group_meeting_id,
-                        $option["option_date"],
-                        $option["start_time"],
-                        $option["end_time"]
-                    );
+            foreach ($valid_options as $option) {
+                $option_stmt->execute([
+                    (int)$group_meeting_id,
+                    $option["start_time"],
+                    $option["end_time"]
+                ]);
 
-                    if ($option_stmt->execute()) {
-                        $created_count++;
-                    }
-                }
-
-                $option_stmt->close();
-
-                $success = "Group meeting created successfully with $created_count option(s).";
-            } else {
-                $error = "Failed to create group meeting.";
+                $created_count++;
             }
+
+            $db->commit();
+            // save all database changes
+
+            $success = "Group meeting created successfully with $created_count option(s).";
+
+            send_json([
+                "success" => true,
+                "message" => $success,
+                "group_meeting_id" => (int)$group_meeting_id,
+                "meeting" => [
+                    "id" => (int)$group_meeting_id,
+                    "title" => $title,
+                    "description" => $description,
+                    "status" => "open"
+                ]
+            ]);
+
+        } catch (Exception $e) {
+            $db->rollBack();
+            // undo database changes if something failed
+
+            $error = "Failed to create group meeting.";
+
+            send_json([
+                "success" => false,
+                "message" => $error
+            ], 500);
         }
     }
 }
+
+send_json([
+    "success" => false,
+    "message" => "Invalid request method."
+], 405);
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Create Group Meeting - MeetMe@McGill</title>
-</head>
-<body>
-    <h1>Create Group Meeting</h1>
-
-    <p><a href="dashboard.php">Back to Dashboard</a></p>
-    <p><a href="logout.php">Logout</a></p>
-
-    <?php if ($error !== ""): ?>
-        <p style="color:red;"><?php echo htmlspecialchars($error); ?></p>
-    <?php endif; ?>
-
-    <?php if ($success !== ""): ?>
-        <p style="color:green;"><?php echo htmlspecialchars($success); ?></p>
-    <?php endif; ?>
-
-    <form action="create_group_meeting.php" method="POST">
-        <label>Meeting Title:</label><br>
-        <input type="text" name="title" required><br><br>
-
-        <label>Description (optional):</label><br>
-        <textarea name="description" rows="4" cols="50"></textarea><br><br>
-
-        <h3>Meeting Options</h3>
-
-        <div>
-            <label>Date:</label>
-            <input type="date" name="option_date[]">
-
-            <label>Start Time:</label>
-            <input type="time" name="start_time[]">
-
-            <label>End Time:</label>
-            <input type="time" name="end_time[]">
-        </div>
-        <br>
-
-        <div>
-            <label>Date:</label>
-            <input type="date" name="option_date[]">
-
-            <label>Start Time:</label>
-            <input type="time" name="start_time[]">
-
-            <label>End Time:</label>
-            <input type="time" name="end_time[]">
-        </div>
-        <br>
-
-        <div>
-            <label>Date:</label>
-            <input type="date" name="option_date[]">
-
-            <label>Start Time:</label>
-            <input type="time" name="start_time[]">
-
-            <label>End Time:</label>
-            <input type="time" name="end_time[]">
-        </div>
-        <br>
-
-        <div>
-            <label>Date:</label>
-            <input type="date" name="option_date[]">
-
-            <label>Start Time:</label>
-            <input type="time" name="start_time[]">
-
-            <label>End Time:</label>
-            <input type="time" name="end_time[]">
-        </div>
-        <br>
-
-        <button type="submit">Create Group Meeting</button>
-    </form>
-</body>
-</html>
