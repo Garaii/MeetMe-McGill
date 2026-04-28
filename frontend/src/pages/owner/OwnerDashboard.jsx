@@ -121,8 +121,8 @@ function OwnerDashboard({ user, onLogout }) {
     try{ //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
       const  data = await apiPost("delete_slot.php", {slot_id: slot.id})
     //IF THE SLOT IS BOOKED WE NOTIFY USER  
-      if (data.booked_by_email) {
-      window.location.href = `mailto:${data.booked_by_email}?subject=Booking Cancelled&body=Hi, your booking slot has been deleted by the owner.`
+      if (data.booked_user_email) {
+      window.location.href = `mailto:${data.booked_user_email}?subject=Booking Cancelled&body=Hi, your booking slot has been deleted by the owner.`
     }
     setSlots(prev => prev.filter(s => s.id !== slot.id))
     } catch(err) {
