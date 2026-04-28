@@ -229,7 +229,16 @@ function OwnerDashboard({ user, onLogout }) {
           description: meetingDescription,
           options: meetingOptions
         })
-        setMeetingSuccess(data.message)
+        setMeetingSuccess(`Meeting created! Share ID ${data.group_meeting_id} with your students.`)
+        const subject = encodeURIComponent(`Group Meeting Invitation - ${meetingTitle}`)
+        const body = encodeURIComponent(
+          `Hi,\n\nYou are invited to vote on a group meeting.\n\nGo to the booking app and click "Submit Availability", then enter Meeting ID: ${data.group_meeting_id}\n\nThank you!`
+        )
+        window.location.href = `mailto:?subject=${subject}&body=${body}`
+
+        // Add to local list so owner can view votes right away
+        setGroupMeetings(prev => [...prev, { id: data.group_meeting_id, title: meetingTitle }])
+            
         setMeetingTitle('')
         setMeetingDescription('')
         setMeetingOptions([
