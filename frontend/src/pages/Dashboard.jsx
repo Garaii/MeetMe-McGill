@@ -265,7 +265,7 @@ const handleLoadGroupMeeting = async () => {
       >
         Request a Meeting
       </button>
-      <button onClick={() => setView("group_vote")}>
+      <button className='submit-tab-btn' onClick={() => setView("group_vote")}>
         Submit Availability
       </button>
     </div>

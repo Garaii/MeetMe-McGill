@@ -309,7 +309,7 @@ button:hover {
 .dashboard-tabs button.active:hover,
 .appt-tab-btn:hover,
 .browse-tab-btn:hover,
-.request-tab-btn:hover {
+.request-tab-btn:hover, .submit-tab-btn:hover {
   background: #b30000;
   border-color: #b30000;
 }
