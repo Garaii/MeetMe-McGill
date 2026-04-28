@@ -320,7 +320,7 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
         )}
 
         {/*______LOADING TABLE OF OWNER AVAILABILITIES_______ */}
-        {!ownersSlotsLoading && ownerSlots.length > 0 && (
+        {!ownerSlotsLoading && ownerSlots.length > 0 && (
           <table className="dashboard-table">
                 <thead>
                   <tr>
@@ -349,7 +349,8 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
                 </tbody>
               </table>
         )}
-
+        </section>
+    )}
 
 
         {/* ____________________ STUDENT REQUESTING A MEETING ______________________*/}
@@ -399,8 +400,8 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
             </section>
           </div>
         )}
-      </section>
-    )}
+     
+    
 
 
 
