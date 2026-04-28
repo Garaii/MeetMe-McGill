@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Navbar from '../components/Navbar'
-import {apiGet, apiPost} from '../../api'
+import {apiGet, apiPost} from '../api'
 
 // Dashboard.jsx
 function DashboardPage({user, onLogout /*, onBook*/}) {
