@@ -22,6 +22,14 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
   const [ownerSlotsLoading, setOwnerSlotsLoading] = useState(false)
   const [bookMessage, setBookMessage] = useState("")
 
+  //REQUEST MEETING
+  const [requestOwners, setRequestOwners] = useState([])
+  const [requestOwnerId, setRequestOwnerId] = useState("")
+  const [requestMessage, setRequestMessage] = useState("")
+  const [requestError, setRequestError] = useState("")
+  const [requestSuccess, setRequestSuccess] = useState("")
+  const [requestLoading, setRequestLoading] = useState(false)
+
   /* ===================== fething bookings ====================== */
   useEffect(()=>{
     apiGet("dashboard.php")
@@ -51,6 +59,21 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
 
   }
 
+  /*=================__________________Fetch owner for request_________________===============*/
+  const fetchRequestOwners = () => {
+    if(ownersLoaded){
+      setRequestOwners(owners)
+      return
+    }
+    apiGet("owners_list.php")
+        .then(data => {
+          setRequestOwners(data.owners || [])
+          setOwners(data.owners || [])
+          setOwnersLoaded(true)
+        })
+        .catch(() => {})
+  }
+
 /* ++++++++++++++++++++++++++++++++ FETCH SLOTS FROM SELECTED OWNER ++++++++++++++++++++++++++++++++++++ */
   const handleSelectOwner = (owner) => {
     setSelectedOwner(owner)
@@ -75,7 +98,7 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
     setBookMessage("")
     try{
       //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
-      await apiPost("book_slot", {slot_id})
+      await apiPost("book_slot.php", {slot_id})
       setBookMessage("Slot booked sucessfully!")
       setOwnerSlots(prev => prev.filter (s => s.id !== slot_id))
 
@@ -104,6 +127,32 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
     }
   }
 
+  /* ================__________________________ TO SEND MEETIJNG REQUEST ______________________________========== */
+  const handleSendRequest = async () => {
+    setRequestError("")
+    setRequestSuccess("")
+ 
+    if (!requestOwnerId || requestMessage.trim() === "") {
+      setRequestError("Please select an owner and write a message.")
+      return
+    }
+ 
+    setRequestLoading(true)
+    try {
+      //WILL HAVE TO update endpoint name request_meeting.php
+      await apiPost("request_meeting.php", {
+        owner_id: requestOwnerId,
+        message: requestMessage
+      })
+      setRequestSuccess("Meeting request sent successfully!")
+      setRequestOwnerId("")
+      setRequestMessage("")
+    } catch (err) {
+      setRequestError(err.message)
+    } finally {
+      setRequestLoading(false)
+    }
+  }
 
 
   return (
@@ -144,6 +193,12 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
         onClick={() => {setView("browse"); fetchOwners()}}
       >
         Browse Owners
+      </button>
+      <button 
+        className='request-tab-btn'
+        onClick={() => { setView("request"); fetchRequestOwners() }}
+      >
+            Request a Meeting
       </button>
     </div>
      
@@ -265,7 +320,7 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
         )}
 
         {/*______LOADING TABLE OF OWNER AVAILABILITIES_______ */}
-        {!ownersLoading && ownerSlots.length > 0 && (
+        {!ownersSlotsLoading && ownerSlots.length > 0 && (
           <table className="dashboard-table">
                 <thead>
                   <tr>
@@ -293,6 +348,56 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
                   ))}
                 </tbody>
               </table>
+        )}
+
+
+
+        {/* ____________________ STUDENT REQUESTING A MEETING ______________________*/}
+        {view === "request" && (
+          <div className="auth-page">
+            <section className="auth-card">
+              <h2>Request a Meeting</h2>
+              <p className="auth-subtitle">Send a meeting request to an owner</p>
+ 
+              {requestError && <p className="auth-error">{requestError}</p>}
+              {requestSuccess && <p className="auth-success">{requestSuccess}</p>}
+ 
+              <div className="auth-form">
+                <div className="form-group">
+                  <label>Select Owner</label>
+                  <select
+                    value={requestOwnerId}
+                    onChange={e => setRequestOwnerId(e.target.value)}
+                  >
+                    <option value="">-- Choose an owner --</option>
+                    {requestOwners.map(owner => (
+                      <option key={owner.id} value={owner.id}>
+                        {owner.name} ({owner.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+ 
+                <div className="form-group">
+                  <label>Message</label>
+                  <textarea
+                    placeholder="Describe why you'd like to meet..."
+                    value={requestMessage}
+                    onChange={e => setRequestMessage(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+ 
+                <button
+                  className="btn-primary btn-full"
+                  onClick={handleSendRequest}
+                  disabled={requestLoading}
+                >
+                  {requestLoading ? "Sending..." : "Send Request"}
+                </button>
+              </div>
+            </section>
+          </div>
         )}
       </section>
     )}

@@ -34,6 +34,11 @@ function OwnerDashboard({ user, onLogout }) {
   const [meetingSuccess, setMeetingSuccess] = useState('')
   const [meetingLoading, setMeetingLoading] = useState(false)
 
+  // INVITATION URL STATE
+  const [inviteUrl, setInviteUrl] = useState('')
+  const [inviteCopied, setInviteCopied] = useState(false)
+
+
   // ======================= Fetch slots from php on mount
   useEffect(() => {
     apiGet('owner_slots.php')
@@ -43,6 +48,16 @@ function OwnerDashboard({ user, onLogout }) {
         setSlotsLoading(false)
       })
       .catch(() => setSlotsLoading(false))
+
+
+      //creating URL using curretn user's ID
+      //Links to owner's booking page
+    const base = window.location.hostname === "localhost"
+    ? "http://localhost:5173"
+    : window.location.origin
+    setInviteUrl(`${base}/book/${user.id}`)
+
+
   }, [])
 
   // ======================== Fetch requests (only when tab opened) 
@@ -55,6 +70,14 @@ function OwnerDashboard({ user, onLogout }) {
         setRequestsLoaded(true)
         
       })
+  }
+
+  // ___________ COPY invite URL to CLipboard
+    const handleCopyInvite = () => {
+    navigator.clipboard.writeText(inviteUrl).then(() => {
+      setInviteCopied(true)
+      setTimeout(() => setInviteCopied(false), 2000)
+    })
   }
 
   // Toggle slot active / private 
@@ -78,11 +101,22 @@ function OwnerDashboard({ user, onLogout }) {
   const handleDeleteSlot = async (slot_id) => {
     if (!window.confirm('Delete this slot?')) return
     try{ //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
-      await apiPost("delete_slot.php", {slot_id})
+      await apiPost("delete_slot.php", {slot_id: slot.id})
+
+      // open mail to to notify slot is booked
+      if (slot.booked_by_email) {
+        window.location.href = `mailto:${slot.booked_by_email}?subject=Booking Cancelled&body=Hi, your booking slot has been deleted by the owner.`
+      }
       setSlots(prev => prev.filter(s => s.id !== slot_id))
     } catch(err){
       alert(err.message)
     } 
+  }
+
+  // Email the person who booked a slot, not full email
+  const handleEmailBookedUser = (slot) => {
+    if (!slot.booked_by_email) return
+    window.location.href = `mailto:${slot.booked_by_email}?subject=Regarding your booking`
   }
 
   // Accept request again transform into json for react
