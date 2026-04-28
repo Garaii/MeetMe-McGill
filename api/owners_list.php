@@ -3,28 +3,24 @@ require_once "bootstrap.php";
 require_once "auth.php";
 
 require_login();
-// only logged-in users can access this page
+// only logged-in users can see the list of owners
 
 $owners = [];
-// array to store owners with available slots
+// array to store owners
 
 $db = get_db();
 // connect to database
 
+// get all users who can receive bookings or meeting requests
 $stmt = $db->prepare("
-    SELECT DISTINCT
-        u.id,
-        u.name,
-        u.email
-    FROM users u
-    JOIN slots s ON s.owner_id = u.id
-    LEFT JOIN bookings b ON b.slot_id = s.id
-    WHERE u.role = 'owner'
-      AND s.is_active = 1
-      AND b.id IS NULL
-    ORDER BY u.name
+    SELECT
+        id,
+        name,
+        email
+    FROM users
+    WHERE role = 'owner'
+    ORDER BY name
 ");
-// get owners who have at least one active unbooked slot
 
 $stmt->execute();
 // run query

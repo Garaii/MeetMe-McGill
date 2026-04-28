@@ -1,110 +1,134 @@
 <?php
-require_once "db.php";
-require_once "helpers.php";
+require_once "bootstrap.php";
 require_once "auth.php";
 
 require_login();
-// only logged-in users can access this page
-
-$user_id = current_user_id();
-// get current logged-in user's ID
-
-$role = current_user_role();
-// get current user's role
-
-if ($role !== "user") {
-    die("Only users can request meetings.");
-}
-// only student users can send meeting requests
+// only logged-in users can request a meeting
 
 $error = "";
 $success = "";
-$owners = [];
-
-// get all owners
-$result = $conn->query("SELECT id, name, email FROM users WHERE role = 'owner' ORDER BY name");
-
-while ($row = $result->fetch_assoc()) {
-    $owners[] = $row;
-}
-// store owners in array for dropdown list
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // only run when form is submitted
+    // only run if form was submitted
 
-    $owner_id = $_POST["owner_id"] ?? "";
+    $user_id = current_user_id();
+    // get logged-in user's ID from session
+
+    $data = read_json();
+    // read JSON data sent by React
+
+    $owner_id = $data["owner_id"] ?? "";
     // get selected owner ID from form
 
-    $message = trim($_POST["message"] ?? "");
-    // get message from form and remove extra spaces
+    $message = trim($data["message"] ?? "");
+    // get message from form
 
-    if ($owner_id === "" || $message === "") {
-        $error = "All fields are required.";
+    $title = trim($data["title"] ?? "Meeting request");
+    // use default title if none was sent
+
+    $suggested_date = $data["suggested_date"] ?? ($data["requested_date"] ?? "");
+    // get suggested date from form
+
+    $start_time = $data["start_time"] ?? ($data["requested_start_time"] ?? "");
+    // get suggested start time from form
+
+    $end_time = $data["end_time"] ?? ($data["requested_end_time"] ?? "");
+    // get suggested end time from form
+
+    if ($owner_id === "" || $message === "" || $suggested_date === "" || $start_time === "" || $end_time === "") {
+        // check if any field is empty
+        $error = "Owner, date, time, and message are required.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 400);
+    }
+
+    $requested_start = $suggested_date . " " . $start_time . ":00";
+    $requested_end = $suggested_date . " " . $end_time . ":00";
+    // combine date and time for SQLite
+
+    if (strtotime($requested_start) === false || strtotime($requested_end) === false) {
+        // check if date or time format is invalid
+        $error = "Invalid date or time.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 400);
+    }
+
+    if (strtotime($requested_end) <= strtotime($requested_start)) {
+        // basic check to make sure end time is after start time
+        $error = "End time must be later than start time.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 400);
+    }
+
+    $db = get_db();
+    // connect to database
+
+    // check that selected owner exists
+    $stmt = $db->prepare("
+        SELECT id
+        FROM users
+        WHERE id = ? AND role = 'owner'
+    ");
+
+    $stmt->execute([(int)$owner_id]);
+    // run query
+
+    $owner = $stmt->fetch();
+    // get query result
+
+    if (!$owner) {
+        // stop if owner does not exist
+        $error = "Selected owner was not found.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 404);
+    }
+
+    // insert meeting request into database
+    $insert = $db->prepare("
+        INSERT INTO meeting_requests
+            (requester_id, owner_id, title, message, requested_start, requested_end, status)
+        VALUES
+            (?, ?, ?, ?, ?, ?, 'pending')
+    ");
+
+    if ($insert->execute([
+        $user_id,
+        (int)$owner_id,
+        $title,
+        $message,
+        $requested_start,
+        $requested_end
+    ])) {
+        $success = "Meeting request sent successfully.";
+
+        send_json([
+            "success" => true,
+            "message" => $success
+        ]);
     } else {
-        // make sure selected owner exists
-        $stmt = $conn->prepare("SELECT id FROM users WHERE id = ? AND role = 'owner'");
-        $stmt->bind_param("i", $owner_id);
-        $stmt->execute();
-        $owner_result = $stmt->get_result();
+        $error = "Failed to send meeting request.";
 
-        if ($owner_result->num_rows !== 1) {
-            $error = "Invalid owner selected.";
-        } else {
-            $insert = $conn->prepare("
-                INSERT INTO meeting_requests (requester_id, owner_id, message, status)
-                VALUES (?, ?, ?, 'pending')
-            ");
-            $insert->bind_param("iis", $user_id, $owner_id, $message);
-
-            if ($insert->execute()) {
-                $success = "Meeting request sent successfully.";
-            } else {
-                $error = "Failed to send meeting request.";
-            }
-
-            $insert->close();
-        }
-
-        $stmt->close();
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 500);
     }
 }
+
+send_json([
+    "success" => false,
+    "message" => "Invalid request method."
+], 405);
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Request a Meeting - MeetMe@McGill</title>
-</head>
-<body>
-    <h1>Request a Meeting</h1>
-
-    <p><a href="dashboard.php">Back to Dashboard</a></p>
-    <p><a href="logout.php">Logout</a></p>
-
-    <?php if ($error !== ""): ?>
-        <p style="color:red;"><?php echo htmlspecialchars($error); ?></p>
-    <?php endif; ?>
-
-    <?php if ($success !== ""): ?>
-        <p style="color:green;"><?php echo htmlspecialchars($success); ?></p>
-    <?php endif; ?>
-
-    <form action="request_meeting.php" method="POST">
-        <label>Select Owner:</label><br>
-        <select name="owner_id" required>
-            <option value="">-- Choose an owner --</option>
-            <?php foreach ($owners as $owner): ?>
-                <option value="<?php echo $owner['id']; ?>">
-                    <?php echo htmlspecialchars($owner['name']) . " (" . htmlspecialchars($owner['email']) . ")"; ?>
-                </option>
-            <?php endforeach; ?>
-        </select><br><br>
-
-        <label>Message:</label><br>
-        <textarea name="message" rows="5" cols="40" required></textarea><br><br>
-
-        <button type="submit">Send Request</button>
-    </form>
-</body>
-</html>

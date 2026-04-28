@@ -25,6 +25,9 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
   //REQUEST MEETING
   const [requestOwners, setRequestOwners] = useState([])
   const [requestOwnerId, setRequestOwnerId] = useState("")
+  const [requestDate, setRequestDate] = useState("")
+  const [requestStartTime, setRequestStartTime] = useState("")
+  const [requestEndTime, setRequestEndTime] = useState("")
   const [requestMessage, setRequestMessage] = useState("")
   const [requestError, setRequestError] = useState("")
   const [requestSuccess, setRequestSuccess] = useState("")
@@ -142,21 +145,31 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
   const handleSendRequest = async () => {
     setRequestError("")
     setRequestSuccess("")
- 
-    if (!requestOwnerId || requestMessage.trim() === "") {
-      setRequestError("Please select an owner and write a message.")
+    if (!requestOwnerId || !requestDate || !requestStartTime || !requestEndTime || requestMessage.trim() === "") {
+      setRequestError("Please select an owner, suggest a time, and write a message.")
       return
     }
- 
+
+    if (requestEndTime <= requestStartTime) {
+      setRequestError("End time must be later than start time.")
+      return
+    }
     setRequestLoading(true)
     try {
       //WILL HAVE TO update endpoint name request_meeting.php
       await apiPost("request_meeting.php", {
         owner_id: requestOwnerId,
-        message: requestMessage
+        message: requestMessage,
+        requested_date: requestDate,
+        start_time: requestStartTime,
+        end_time: requestEndTime
       })
+
       setRequestSuccess("Meeting request sent successfully!")
       setRequestOwnerId("")
+      setRequestDate("")
+      setRequestStartTime("")
+      setRequestEndTime("")
       setRequestMessage("")
     } catch (err) {
       setRequestError(err.message)
@@ -164,6 +177,7 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
       setRequestLoading(false)
     }
   }
+
 /* t2+++++++++++++++++++++++----------- LOAD GROUP ---------+++++++++++++++++++++ */
 const handleLoadGroupMeeting = async () => {
     setGroupFetchError("")
@@ -446,7 +460,32 @@ const handleLoadGroupMeeting = async () => {
                 ))}
               </select>
             </div>
-
+            <div className="form-group">
+              <label>Suggested Date</label>
+              <input
+                type="date"
+                value={requestDate}
+                onChange={e => setRequestDate(e.target.value)}
+              />
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Start Time</label>
+                <input
+                  type="time"
+                  value={requestStartTime}
+                  onChange={e => setRequestStartTime(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label>End Time</label>
+                <input
+                  type="time"
+                  value={requestEndTime}
+                  onChange={e => setRequestEndTime(e.target.value)}
+                />
+              </div>
+            </div>
             <div className="form-group">
               <label>Message</label>
               <textarea

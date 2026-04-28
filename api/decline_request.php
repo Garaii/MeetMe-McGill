@@ -1,52 +1,67 @@
 <?php
-require_once "db.php";
-require_once "helpers.php";
+require_once "bootstrap.php";
 require_once "auth.php";
 
 require_owner();
-// only logged-in owners can access this page
+// only owners can decline requests sent to them
 
-$owner_id = current_user_id();
-// get current logged-in owner's ID
+$error = "";
+$success = "";
 
-$request_id = $_GET["request_id"] ?? null;
-// get request ID from URL
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // only run if form was submitted
 
-if ($request_id === null) {
-    die("Invalid request.");
+    $owner_id = current_user_id();
+    // get logged-in owner's ID from session
+
+    $data = read_json();
+    // read JSON data sent by React
+
+    $request_id = $data["request_id"] ?? "";
+    // get request ID from form
+
+    if ($request_id === "") {
+        // check if request ID is missing
+        $error = "Invalid request.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 400);
+    }
+
+    $db = get_db();
+    // connect to database
+
+    // update request only if it belongs to this owner
+    $stmt = $db->prepare("
+        UPDATE meeting_requests
+        SET status = 'declined'
+        WHERE id = ? AND owner_id = ?
+    ");
+
+    $stmt->execute([(int)$request_id, $owner_id]);
+    // run update query
+
+    if ($stmt->rowCount() === 1) {
+        $success = "Meeting request declined.";
+
+        send_json([
+            "success" => true,
+            "message" => $success
+        ]);
+    } else {
+        $error = "Request not found.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 404);
+    }
 }
-// stop if no request ID was provided
 
-// check that this request belongs to the current owner and is still pending
-$stmt = $conn->prepare("
-    SELECT id
-    FROM meeting_requests
-    WHERE id = ? AND owner_id = ? AND status = 'pending'
-");
-$stmt->bind_param("ii", $request_id, $owner_id);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows !== 1) {
-    die("Access denied or request already processed.");
-}
-// stop if request does not belong to this owner or is not pending
-
-$stmt->close();
-
-// update request status to declined
-$update = $conn->prepare("
-    UPDATE meeting_requests
-    SET status = 'declined'
-    WHERE id = ?
-");
-$update->bind_param("i", $request_id);
-
-if ($update->execute()) {
-    redirect("owner_requests.php");
-} else {
-    die("Failed to decline request.");
-}
-
-$update->close();
+send_json([
+    "success" => false,
+    "message" => "Invalid request method."
+], 405);
 ?>
