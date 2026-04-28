@@ -299,7 +299,7 @@ function OwnerDashboard({ user, onLogout }) {
             Create Group Meeting
           </button>
 
-          <button onClick={() => setView("group_meetings")}>
+          <button className="appt-tab-btn" onClick={() => setView("group_meetings")}>
             View Group Votes
           </button>
 
