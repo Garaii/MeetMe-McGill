@@ -1,77 +1,91 @@
 <?php
-require_once "db.php";
-require_once "helpers.php";
+require_once "bootstrap.php";
 require_once "auth.php";
 
 require_login();
-// only logged-in users can access this page
+// only logged-in users can cancel their own bookings
 
-$user_id = current_user_id();
-// get current logged-in user's ID
+$error = "";
+$success = "";
 
-$booking_id = $_GET["booking_id"] ?? null;
-// get booking ID from URL
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // only run if form was submitted
 
-if ($booking_id === null) {
-    die("Invalid request.");
-}
-// stop if no booking ID provided
+    $user_id = current_user_id();
+    // get current logged-in user's ID
 
-// check that this booking belongs to the current user
-$stmt = $conn->prepare("
-    SELECT bookings.id, slots.owner_id
-    FROM bookings
-    INNER JOIN slots ON bookings.slot_id = slots.id
-    WHERE bookings.id = ? AND bookings.user_id = ?
-");
-// join bookings with slots to also get owner_id
+    $data = read_json();
+    // read JSON data sent by React
 
-$stmt->bind_param("ii", $booking_id, $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
+    $booking_id = $data["booking_id"] ?? "";
+    // get booking ID from form
 
-if ($result->num_rows !== 1) {
-    die("Access denied.");
-}
-// stop if booking does not belong to this user
+    if ($booking_id === "") {
+        // check if booking ID is missing
+        $error = "Invalid cancel request.";
 
-$data = $result->fetch_assoc();
-// store booking + owner info
-
-$stmt->close();
-
-// delete the booking
-$delete = $conn->prepare("DELETE FROM bookings WHERE id = ?");
-$delete->bind_param("i", $booking_id);
-
-if ($delete->execute()) {
-
-    // OPTIONAL: prepare mailto link (for later use)
-    $owner_id = $data["owner_id"];
-
-    // get owner email
-    $owner_stmt = $conn->prepare("SELECT email FROM users WHERE id = ?");
-    $owner_stmt->bind_param("i", $owner_id);
-    $owner_stmt->execute();
-    $owner_result = $owner_stmt->get_result();
-
-    if ($owner_result->num_rows === 1) {
-        $owner = $owner_result->fetch_assoc();
-
-        // NEED TO FIX THIS: NOTIFY THE OWNER ONCE BOOKING IS CANCELLED!!!
-        $mailto = "mailto:" . $owner["email"] . "?subject=Booking Cancelled&body=A user has cancelled their booking.";
-
-        // for now just redirect
-        redirect("dashboard.php");
-    } else {
-        redirect("dashboard.php");
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 400);
     }
 
-    $owner_stmt->close();
+    $db = get_db();
+    // connect to database
 
-} else {
-    die("Failed to cancel booking.");
+    // check that this booking belongs to the current user
+    $stmt = $db->prepare("
+        SELECT
+            b.id,
+            owner.email AS owner_email
+        FROM bookings b
+        JOIN slots s ON b.slot_id = s.id
+        JOIN users owner ON s.owner_id = owner.id
+        WHERE b.id = ? AND b.user_id = ?
+    ");
+
+    $stmt->execute([(int)$booking_id, $user_id]);
+    $booking = $stmt->fetch();
+
+    if (!$booking) {
+        // stop if booking does not belong to this user
+        $error = "Booking not found.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 404);
+    }
+
+    $owner_email = $booking["owner_email"];
+    // save owner email before deleting booking
+
+    // delete the booking
+    $delete = $db->prepare("
+        DELETE FROM bookings
+        WHERE id = ? AND user_id = ?
+    ");
+
+    if ($delete->execute([(int)$booking_id, $user_id])) {
+        $success = "Booking cancelled successfully.";
+
+        send_json([
+            "success" => true,
+            "message" => $success,
+            "owner_email" => $owner_email
+        ]);
+    } else {
+        $error = "Failed to cancel booking.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 500);
+    }
 }
 
-$delete->close();
+send_json([
+    "success" => false,
+    "message" => "Invalid request method."
+], 405);
 ?>
