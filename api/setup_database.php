@@ -108,7 +108,7 @@ try {
     send_json([
         "success" => true,
         "message" => "Database is ready.",
-        "database" => "data/meetme.sqlite"
+        "database" => "api/meetme.sqlite"
     ]);
 } catch (Exception $e) {
     send_json([
