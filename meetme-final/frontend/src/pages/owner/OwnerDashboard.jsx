@@ -46,6 +46,16 @@ function OwnerDashboard({ user, onLogout }) {
   const [inviteCopied, setInviteCopied] = useState(false)
 
 
+  // RECURRING OFFICE HOURS
+  const [recurWeekday, setRecurWeekday] = useState('')
+  const [recurStart, setRecurStart] = useState('')
+  const [recurEnd, setRecurEnd] = useState('')
+  const [recurWeeks, setRecurWeeks] = useState('')
+  const [recurError, setRecurError] = useState('')
+  const [recurSuccess, setRecurSuccess] = useState('')
+  const [recurLoading, setRecurLoading] = useState(false)
+
+
   // ======================= Fetch slots from php on mount
   useEffect(() => {
     apiGet('owner_slots.php')
@@ -90,7 +100,7 @@ function OwnerDashboard({ user, onLogout }) {
   // Toggle slot active / private 
   const handleToggleVisibility = async (slot_id, current_status) => {
     try{ /*WILL HAVE TO UPDATE ENDPOINT NAME WHEN PHP PAGE BELOW IS DONE */
-      await apiPost("update_slot_availability.php",{
+      await apiPost("update_slot_visibility.php",{
       slot_id,
       is_active: current_status ? 0: 1
     })
@@ -105,7 +115,7 @@ function OwnerDashboard({ user, onLogout }) {
   }
 
   // _____________________________Delete slot , transforming into json
-  const handleDeleteSlot = async (slot_id) => {
+  const handleDeleteSlot = async (slot) => {
     if (!window.confirm('Delete this slot?')) return
     try{ //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
       await apiPost("delete_slot.php", {slot_id: slot.id})
@@ -292,6 +302,10 @@ function OwnerDashboard({ user, onLogout }) {
           <button onClick={() => setView("group_meetings")}>
             View Group Votes
           </button>
+
+          <button className="appt-tab-btn" onClick={() => setView("recurring")}>
+            Recurring Office Hours
+          </button>
         </div>
 
         {/* == MY SLOTS == */}
@@ -329,7 +343,7 @@ function OwnerDashboard({ user, onLogout }) {
                          {slot.booked_by && (
                           <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                         )}
-                        <button onClick={() => handleDeleteSlot(slot.id)}>
+                        <button onClick={() => handleDeleteSlot(slot)}>
                           Delete
                         </button>
                       </td>
