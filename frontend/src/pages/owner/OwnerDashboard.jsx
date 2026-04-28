@@ -120,8 +120,12 @@ function OwnerDashboard({ user, onLogout }) {
     if (!window.confirm('Delete this slot?')) return
     try{ //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
       await apiPost("delete_slot.php", {slot_id: slot.id})
-      setSlots(prev => prev.filter(s => s.id !== slot.id))
-    } catch(err){
+    //IF THE SLOT IS BOOKED WE NOTIFY USER  
+      if (slot.booked_by_email) {
+      window.location.href = `mailto:${slot.booked_by_email}?subject=Booking Cancelled&body=Hi, your booking slot has been deleted by the owner.`
+    }
+    setSlots(prev => prev.filter(s => s.id !== slot.id))
+    } catch(err) {
       alert(err.message)
     } 
   }
@@ -339,11 +343,11 @@ function OwnerDashboard({ user, onLogout }) {
                          {slot.booked_by && (
                           <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                         )}
-                        {!slot.booked_by && (
+                        {/* SEE IF WORKED*/}
                           <button onClick={() => handleDeleteSlot(slot)}>
                             Delete
                           </button>
-                        )}
+                        
                       </td>
                     </tr>
                   ))}
