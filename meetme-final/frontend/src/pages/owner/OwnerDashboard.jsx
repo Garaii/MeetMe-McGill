@@ -34,6 +34,13 @@ function OwnerDashboard({ user, onLogout }) {
   const [meetingSuccess, setMeetingSuccess] = useState('')
   const [meetingLoading, setMeetingLoading] = useState(false)
 
+  // FOR GROUP MEETING
+  const [groupMeetings, setGroupMeetings] = useState([])
+  const [selectedMeeting, setSelectedMeeting] = useState(null)
+  const [meetingVotes, setMeetingVotes] = useState([])
+  const [votesLoading, setVotesLoading] = useState(false)
+  const [finalizeMessage, setFinalizeMessage] = useState('')
+
   // INVITATION URL STATE
   const [inviteUrl, setInviteUrl] = useState('')
   const [inviteCopied, setInviteCopied] = useState(false)
@@ -97,7 +104,7 @@ function OwnerDashboard({ user, onLogout }) {
     
   }
 
-  // Delete slot , transforming into json
+  // _____________________________Delete slot , transforming into json
   const handleDeleteSlot = async (slot_id) => {
     if (!window.confirm('Delete this slot?')) return
     try{ //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
@@ -144,7 +151,7 @@ function OwnerDashboard({ user, onLogout }) {
     }
   }
 
-  // Create single slot transforming to php -> json -> react
+  // _______________________Create single slot transforming to php -> json -> react
   const handleCreateSlot = async () => {
     setSlotError('')
     setSlotSuccess('')
@@ -167,8 +174,25 @@ function OwnerDashboard({ user, onLogout }) {
     } finally{
     setSlotLoading(false)}
   }
+  // ____________________________ create recurrign OFFICE HOURS
+ const handleCreateRecurring = async () => {
+    setRecurError(''); setRecurSuccess(''); setRecurLoading(true)
+    try {
+      const data = await apiPost("create_recurring_office_hours.php", {
+        weekday: recurWeekday,
+        start_time: recurStart,
+        end_time: recurEnd,
+        weeks: recurWeeks
+      })
+      setRecurSuccess(data.message)
+      setRecurWeekday(''); setRecurStart(''); setRecurEnd(''); setRecurWeeks('')
+      apiGet("owner_slots.php").then(d => setSlots(d.slots || []))
+    } catch (err) { setRecurError(err.message) }
+    finally { setRecurLoading(false) }
+  }
 
-  //  Group meeting option helpers transforming to php -> json -> react
+
+  // __________________Group meeting option helpers transforming to php -> json -> react
   const updateMeetingOption = (index, field, value) => {
     setMeetingOptions(prev =>
       prev.map((opt, i) => i === index ? { ...opt, [field]: value } : opt)
@@ -208,27 +232,65 @@ function OwnerDashboard({ user, onLogout }) {
         setMeetingLoading(false)
       }
   }
+    // *******************_______View votes for a group meeting ────────────────────────────────
+  const handleViewVotes = async (meeting) => {
+    setSelectedMeeting(meeting)
+    setMeetingVotes([])
+    setFinalizeMessage('')
+    setVotesLoading(true)
+    setView("view_votes")
+    try {
+      const data = await apiGet(`view_group_counts.php?group_meeting_id=${meeting.id}`)
+      setMeetingVotes(data.options || [])
+    } catch (err) { setFinalizeMessage(err.message) }
+    finally { setVotesLoading(false) }
+  }
+ 
+  // ***************__________________ Finalize a group meeting option ───────────────────────────────
+  const handleFinalizeOption = async (option_id) => {
+    if (!window.confirm('Finalize this time slot? It will be created as an active booking slot.')) return
+    setFinalizeMessage('')
+    try {
+      const data = await apiPost("finalize_group_meeting.php", { option_id })
+      setFinalizeMessage(data.message)
+      apiGet("owner_slots.php").then(d => setSlots(d.slots || []))
+    } catch (err) { setFinalizeMessage(err.message) }
+  }
 
-  // actual UI 
+  //  ####################################%%%%%%%%%%%%%%%%%%%_____________________ actual UI 
   return (
     <div>
       <Navbar onLogout={onLogout} user={user} />
       <div className="dashboard">
         <h1>Welcome back, {user.name}!</h1>
 
+        {/* ___________ FOR INVITATION ___________ */}
+        <div className="invite-banner">
+          <span>Your booking link:</span>
+          <code>{inviteUrl}</code>
+          <button onClick={handleCopyInvite}>{inviteCopied ? "Copied!" : "Copy Link"}</button>
+        </div>
+
         {/* TABS */}
         <div className="dashboard-tabs">
           <button className="appt-tab-btn" onClick={() => setView("slots")}>
             My Slots
           </button>
-          <button className="browse-tab-btn" onClick={() => { setView("requests"); fetchRequests() }}>
+
+          <button className="appt-tab-btn" onClick={() => { setView("requests"); fetchRequests() }}>
             Meeting Requests
           </button>
-          <button onClick={() => setView("create_slot")}>
+
+          <button className="appt-tab-btn" onClick={() => setView("create_slot")}>
             Create Slot
           </button>
-          <button onClick={() => setView("create_group")}>
+
+          <button className="appt-tab-btn" onClick={() => setView("create_group")}>
             Create Group Meeting
+          </button>
+
+          <button onClick={() => setView("group_meetings")}>
+            View Group Votes
           </button>
         </div>
 
@@ -264,6 +326,9 @@ function OwnerDashboard({ user, onLogout }) {
                         <button onClick={() => handleToggleVisibility(slot.id, slot.is_active)}>
                           {slot.is_active ? "Make Private" : "Make Active"}
                         </button>
+                         {slot.booked_by && (
+                          <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
+                        )}
                         <button onClick={() => handleDeleteSlot(slot.id)}>
                           Delete
                         </button>
@@ -353,6 +418,45 @@ function OwnerDashboard({ user, onLogout }) {
           </div>
         )}
 
+        {/* **********************______________________RECCURING OFFICE HOURS _________________******************* */}
+        {view === "recurring" && (
+        <div className="auth-page">
+          <section className="auth-card">
+            <h2>Recurring Office Hours</h2>
+
+            <p className="auth-subtitle">Create the same slot every week for X weeks</p>
+            {recurError && <p className="auth-error">{recurError}</p>}
+            {recurSuccess && <p className="auth-success">{recurSuccess}</p>}
+            <div className="auth-form">
+              <div className="form-group">
+                <label>Weekday</label>
+                <select value={recurWeekday} onChange={e => setRecurWeekday(e.target.value)}>
+                  <option value="">-- Select a weekday --</option>
+                  {["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].map(d => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Start Time</label>
+                <input type="time" value={recurStart} onChange={e => setRecurStart(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label>End Time</label>
+                <input type="time" value={recurEnd} onChange={e => setRecurEnd(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label>Number of Weeks</label>
+                <input type="number" min="1" value={recurWeeks} onChange={e => setRecurWeeks(e.target.value)} />
+              </div>
+              <button className="btn-primary btn-full" onClick={handleCreateRecurring} disabled={recurLoading}>
+                {recurLoading ? 'Creating...' : 'Create Recurring Slots'}
+              </button>
+            </div>
+          </section>
+        </div>
+        )}
+
         {/* ################## CREATE GROUP MEETING ################### */}
         {view === "create_group" && (
           <div className='auth-page'>
@@ -382,7 +486,7 @@ function OwnerDashboard({ user, onLogout }) {
                 />
               </div>
 
-              <h3>Meeting Options</h3>
+              <h3>Meeting Options</h3> {/* WILL HAVE TO REVAMP THIS, BASIC UI BUT UGLY */}
               {meetingOptions.map((opt, i) => (
                 <div key={i} className="form-group meeting-option-row">
                   <label>Option {i + 1}</label>
@@ -408,6 +512,65 @@ function OwnerDashboard({ user, onLogout }) {
           </section>
           </div>
         )}
+
+        {/******************______________VIEW NUMBER OF VOTES GROUP MEETING_____________********************* */}
+        {view === "group_meetings" && (
+          <section className="appointments-view">
+            <h2>My Group Meetings</h2>
+            {groupMeetings.length === 0 ? (
+              <p>No group meetings yet. Create one first.</p>
+            ) : (
+              <div className="owners-list">
+                {groupMeetings.map(meeting => (
+                  <div key={meeting.id} className="owner-card">
+                    <strong>{meeting.title}</strong>
+                    <button className="btn-primary" onClick={() => handleViewVotes(meeting)}>
+                      View Votes
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+ 
+        {/* **************_____________VOTE COUNTS + FINALIZE________________***************** */}
+        {view === "view_votes" && selectedMeeting && (
+          <section className="appointments-view">
+            <button onClick={() => setView("group_meetings")}>← Back</button>
+            <h2>Votes for: {selectedMeeting.title}</h2>
+            {finalizeMessage && <p className="form-message">{finalizeMessage}</p>}
+            {votesLoading ? <p>Loading votes...</p> : meetingVotes.length === 0 ? (
+              <p>No votes yet.</p>
+            ) : (
+              <table className="dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Date</th><th>Start</th><th>End</th>
+                    <th>Votes</th><th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {meetingVotes.map(option => (
+                    <tr key={option.id}>
+                      <td>{option.option_date}</td>
+                      <td>{option.start_time}</td>
+                      <td>{option.end_time}</td>
+                      <td>{option.vote_count}</td>
+                      <td>
+                        <button className="btn-primary" onClick={() => handleFinalizeOption(option.id)}>
+                          Finalize
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </section>
+        )}
+
+
 
         {/* BOTTOM ACTIONS  $$$$$$$$$$$$$$$$$$$$$$$$$$ maybe put this button elsewhere $$$$$$$$$$$$$$$$$$$$$$$$$$$$ */}
         <div className="dashboard-actions">

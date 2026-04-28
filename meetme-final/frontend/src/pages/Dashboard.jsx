@@ -30,6 +30,17 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
   const [requestSuccess, setRequestSuccess] = useState("")
   const [requestLoading, setRequestLoading] = useState(false)
 
+
+  //GROUP MEETING
+  const [groupMeetingId, setGroupMeetingId] = useState("")
+  const [groupMeeting, setGroupMeeting] = useState(null)
+  const [groupOptions, setGroupOptions] = useState([])
+  const [selectedOptions, setSelectedOptions] = useState([])
+  const [groupLoading, setGroupLoading] = useState(false)
+  const [groupError, setGroupError] = useState("")
+  const [groupSuccess, setGroupSuccess] = useState("")
+  const [groupFetchError, setGroupFetchError] = useState("")
+
   /* ===================== fething bookings ====================== */
   useEffect(()=>{
     apiGet("dashboard.php")
@@ -153,8 +164,62 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
       setRequestLoading(false)
     }
   }
+/* t2+++++++++++++++++++++++----------- LOAD GROUP ---------+++++++++++++++++++++ */
+const handleLoadGroupMeeting = async () => {
+    setGroupFetchError("")
+    setGroupMeeting(null)
+    setGroupOptions([])
+    setSelectedOptions([])
+    setGroupSuccess("")
+ 
+    if (!groupMeetingId.trim()) {
+      setGroupFetchError("Please enter a meeting ID.")
+      return
+    }
+ 
+    try { // WILL HATE TO UPDATE
+      const data = await apiGet(`submit_group_availability.php?group_meeting_id=${groupMeetingId}`)
+      setGroupMeeting(data.meeting)
+      setGroupOptions(data.options || [])
+    } catch (err) {
+      setGroupFetchError(err.message)
+    }
+  }
+  /*T2 ++++++++++++++++++++++++++++++_______OPTIONS SELECTION_______++++++++++++++++++++++++++++++++ */
+    const handleToggleOption = (option_id) => {
+    setSelectedOptions(prev =>
+      prev.includes(option_id)
+        ? prev.filter(id => id !== option_id)
+        : [...prev, option_id]
+    )
+    }
 
+  /*T2 ________________AVAILABILITY____________________ */
+   const handleSubmitAvailability = async () => {
+    setGroupError("")
+    setGroupSuccess("")
+ 
+    if (selectedOptions.length === 0) {
+      setGroupError("Please select at least one option.")
+      return
+    }
+ 
+    setGroupLoading(true)
+    try { //WILL HAVE TO UPDATE
+      const data = await apiPost("submit_group_availability.php", {
+        group_meeting_id: groupMeetingId,
+        selected_options: selectedOptions
+      })
+      setGroupSuccess(data.message)
+      setSelectedOptions([])
+    } catch (err) {
+      setGroupError(err.message)
+    } finally {
+      setGroupLoading(false)
+    }
+  }
 
+  /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&_______________________ ui __________________&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& */
   return (
   <div>
     <Navbar onLogout={onLogout} user={user} />
@@ -198,7 +263,10 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
         className='request-tab-btn'
         onClick={() => { setView("request"); fetchRequestOwners() }}
       >
-            Request a Meeting
+        Request a Meeting
+      </button>
+      <button onClick={() => setView("group_vote")}>
+        Submit Availability
       </button>
     </div>
      
@@ -353,58 +421,110 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
     )}
 
 
-        {/* ____________________ STUDENT REQUESTING A MEETING ______________________*/}
-        {view === "request" && (
-          <div className="auth-page">
-            <section className="auth-card">
-              <h2>Request a Meeting</h2>
-              <p className="auth-subtitle">Send a meeting request to an owner</p>
- 
-              {requestError && <p className="auth-error">{requestError}</p>}
-              {requestSuccess && <p className="auth-success">{requestSuccess}</p>}
- 
-              <div className="auth-form">
-                <div className="form-group">
-                  <label>Select Owner</label>
-                  <select
-                    value={requestOwnerId}
-                    onChange={e => setRequestOwnerId(e.target.value)}
-                  >
-                    <option value="">-- Choose an owner --</option>
-                    {requestOwners.map(owner => (
-                      <option key={owner.id} value={owner.id}>
-                        {owner.name} ({owner.email})
-                      </option>
-                    ))}
-                  </select>
-                </div>
- 
-                <div className="form-group">
-                  <label>Message</label>
-                  <textarea
-                    placeholder="Describe why you'd like to meet..."
-                    value={requestMessage}
-                    onChange={e => setRequestMessage(e.target.value)}
-                    rows={4}
-                  />
-                </div>
- 
-                <button
-                  className="btn-primary btn-full"
-                  onClick={handleSendRequest}
-                  disabled={requestLoading}
-                >
-                  {requestLoading ? "Sending..." : "Send Request"}
-                </button>
-              </div>
-            </section>
+    {/* T1____________________ STUDENT REQUESTING A MEETING ______________________*/}
+    {view === "request" && (
+      <div className="auth-page">
+        <section className="auth-card">
+          <h2>Request a Meeting</h2>
+          <p className="auth-subtitle">Send a meeting request to an owner</p>
+
+          {requestError && <p className="auth-error">{requestError}</p>}
+          {requestSuccess && <p className="auth-success">{requestSuccess}</p>}
+
+          <div className="auth-form">
+            <div className="form-group">
+              <label>Select Owner</label>
+              <select
+                value={requestOwnerId}
+                onChange={e => setRequestOwnerId(e.target.value)}
+              >
+                <option value="">-- Choose an owner --</option>
+                {requestOwners.map(owner => (
+                  <option key={owner.id} value={owner.id}>
+                    {owner.name} ({owner.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Message</label>
+              <textarea
+                placeholder="Describe why you'd like to meet..."
+                value={requestMessage}
+                onChange={e => setRequestMessage(e.target.value)}
+                rows={4}
+              />
+            </div>
+
+            <button
+              className="btn-primary btn-full"
+              onClick={handleSendRequest}
+              disabled={requestLoading}
+            >
+              {requestLoading ? "Sending..." : "Send Request"}
+            </button>
           </div>
-        )}
-     
-    
+        </section>
+      </div>
+    )}
 
+    {/* T2____________ GROUP AVAILABILITY MEETING ____________ */}
+    {view === "group_vote" && (
+      <div className="auth-page">
+        <section className="auth-card">
+          <h2>Submit Availability</h2>
+          <p className="auth-subtitle">Enter the meeting ID shared by the owner</p>
 
+          <div className="auth-form">
+            <div className="form-group">
+              <label>Group Meeting ID</label>
+              <input
+                type="number"
+                placeholder="e.g. 12"
+                value={groupMeetingId}
+                onChange={e => setGroupMeetingId(e.target.value)}
+              />
+            </div>
+            {groupFetchError && <p className="auth-error">{groupFetchError}</p>}
+            <button className="btn-primary btn-full" onClick={handleLoadGroupMeeting}>
+              Load Meeting
+            </button>
+          </div>
 
+          {/* Once meeting is loaded, show options to vote on */}
+          {groupMeeting && (
+            <div className="auth-form" style={{ marginTop: '1rem' }}>
+              <h3>{groupMeeting.title}</h3>
+              {groupMeeting.description && <p>{groupMeeting.description}</p>}
+              <p>Organized by: <strong>{groupMeeting.owner_name}</strong></p>
+
+              <p>Select the times that work for you:</p>
+              {groupOptions.map(option => (
+                <div key={option.id} className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem' }}>
+                  <input
+                    type="checkbox"
+                    id={`opt-${option.id}`}
+                    checked={selectedOptions.includes(option.id)}
+                    onChange={() => handleToggleOption(option.id)}
+                  />
+                  <label htmlFor={`opt-${option.id}`}>
+                    {option.option_date} — {option.start_time} to {option.end_time}
+                  </label>
+                </div>
+              ))}
+
+              {groupError && <p className="auth-error">{groupError}</p>}
+              {groupSuccess && <p className="auth-success">{groupSuccess}</p>}
+
+              <button className="btn-primary btn-full" onClick={handleSubmitAvailability} disabled={groupLoading}>
+                {groupLoading ? "Submitting..." : "Submit Availability"}
+              </button>
+            </div>
+          )}
+        </section>
+      </div>
+    )}
    
     {/* APPOINTMENT ACTIONS*/}
     <div className="dashboard-actions">
