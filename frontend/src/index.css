@@ -1,6 +1,6 @@
 /* Variables */
 :root {
-  --accent:       #cc0000;
+  --accent:       #ed1b2f;
   --accent-light: #fdf2f2;
   --text:         #1a1a1a;
   --text-muted:   #6b7280;
@@ -314,7 +314,7 @@ button:hover {
 .appt-tab-btn:hover,
 .browse-tab-btn:hover,
 .request-tab-btn:hover, .submit-tab-btn:hover {
-  background: #b30000;
+  background: #ed1b2f;
   border-color: #b30000;
 }
 
