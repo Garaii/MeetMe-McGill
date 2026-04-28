@@ -125,7 +125,11 @@ function OwnerDashboard({ user, onLogout }) {
 
       // IF THE SLOT IS BOOKED WE NOTIFY USER
       if (data.booked_user_email) {
-        window.location.href = `mailto:${data.booked_user_email}?subject=Booking Cancelled&body=Hi, your booking slot has been deleted by the owner.`
+       const body = encodeURIComponent(
+        `Hi,\n\nThis is to let you know that your booking has been cancelled by ${user.name}.\n\nPlease log in to the booking app to reserve another slot.\n\nThank you!`
+      )
+      const subject = encodeURIComponent('Your Booking Has Been Cancelled')
+      window.location.href = `mailto:${data.booked_user_email}?subject=${subject}&body=${body}`
       }
 
       setSlots(prev => prev.filter(s => s.id !== slot.id))
@@ -137,7 +141,11 @@ function OwnerDashboard({ user, onLogout }) {
   // Email the person who booked a slot, not full email
   const handleEmailBookedUser = (slot) => {
     if (!slot.booked_by_email) return
-    window.location.href = `mailto:${slot.booked_by_email}?subject=Regarding your booking`
+    const subject = encodeURIComponent('Regarding Your Booking')
+    const body = encodeURIComponent(
+      `Hi,\n\nThis is ${user.name} reaching out regarding your booking on ${slot.slot_date} from ${slot.start_time} to ${slot.end_time}.\n\n`
+    )
+    window.location.href = `mailto:${slot.booked_by_email}?subject=${subject}&body=${body}`
   }
 
   // Accept request again transform into json for react
@@ -255,7 +263,7 @@ function OwnerDashboard({ user, onLogout }) {
 
       const subject = encodeURIComponent(`Group Meeting Invitation - ${meetingTitle}`)
       const body = encodeURIComponent(
-        `Hi,\n\nYou are invited to vote on a group meeting.\n\nGo to the booking app and click "Submit Availability", then enter Meeting ID: ${data.group_meeting_id}\n\nThank you!`
+        `Hi,\n\nYou have been invited by ${user.name} to vote on a group meeting: "${meetingTitle}".\n\nGo to the booking app and click "Submit Availability", then enter Meeting ID: ${data.group_meeting_id}\n\nThank you!`
       )
 
       window.location.href = `mailto:?subject=${subject}&body=${body}`

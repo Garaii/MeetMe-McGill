@@ -133,9 +133,10 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
       if(data.owner_email){
           const body = encodeURIComponent(
         `Hi ${data.owner_name || ''},\n\nThis is to let you know that ${user.name} has cancelled their booking.\n\nThe slot is now available again.\n\nThank you!`
-        )
-        const subject = encodeURIComponent('Booking Cancelled')
-        window.location.href = `mailto:${data.owner_email}?subject=${subject}&body=${body}`
+      )
+      const subject = encodeURIComponent('Booking Cancelled')
+      window.location.href = `mailto:${data.owner_email}?subject=${subject}&body=${body}`
+
       }
 
       setBookings( prev => prev.filter (b=> b.booking_id !== booking.booking_id))
