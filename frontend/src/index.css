@@ -41,12 +41,27 @@ h1, h2, h3 { margin: 0; font-weight: 600; color: var(--text); }
   background: var(--bg);
 }
 
+/*logo*/
+.nav-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-logo svg {
+  display: block; 
+  height: 50px;   /* control size here */
+  width: auto;    /* to keep ratio */
+}
+
 .nav-links {
   display: flex;
   gap: 10px;
+  align-items: center;
 }
 
-/* Buttons */
+/* +++++++ Buttons ++++++++ */
 button {
   cursor: pointer;
   font-size: 14px;
