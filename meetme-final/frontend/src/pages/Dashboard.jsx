@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import {apiGet, apiPost} from '../api'
 
@@ -59,7 +59,7 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
     setOwnerSlotsLoading(true)
     setView("book")
 
-    apiGet('owner_booking_page.php?owner_id=${owner.id}')
+    apiGet(`owner_booking_page.php?owner_id=${owner.id}`)
       .then(data => {
         setOwnerSlots(data.slots || [])
         setOwnerSlotsLoading(false)
@@ -94,7 +94,7 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
       const data = await apiPost("cancel_booking.php", { booking_id: booking.booking_id})
 
       if(data.owner_email){
-        window.location_href= `mailto:${data.owner_email}?subject=Booking Cancelled&body=Hi, I have cancelled my booking.`
+        window.location.href= `mailto:${data.owner_email}?subject=Booking Cancelled&body=Hi, I have cancelled my booking.`
       }
 
       setBookings( prev => prev.filter (b=> b.booking_id !== booking.booking_id))
@@ -141,7 +141,7 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
       </button>
       <button 
         className="browse-tab-btn" 
-        onClick={() => setView("browse")}
+        onClick={() => {setView("browse"); fetchOwners()}}
       >
         Browse Owners
       </button>
