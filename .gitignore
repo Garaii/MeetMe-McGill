@@ -16,6 +16,7 @@ api/*.sqlite
 
 # system files
 .DS_Store
+**/.DS_Store
 
 # environment files
 .env
