@@ -11,7 +11,7 @@ $owner_id = current_user_id();
 $db = get_db();
 // connect to database
 
-// get pending and answered meeting requests for this owner
+// get pending meeting requests for this owner
 $stmt = $db->prepare("
     SELECT
         mr.id,
@@ -26,7 +26,7 @@ $stmt = $db->prepare("
         u.email AS requester_email
     FROM meeting_requests mr
     JOIN users u ON mr.requester_id = u.id
-    WHERE mr.owner_id = ?
+    WHERE mr.owner_id = ? AND mr.status = 'pending'
     ORDER BY mr.created_at DESC
 ");
 

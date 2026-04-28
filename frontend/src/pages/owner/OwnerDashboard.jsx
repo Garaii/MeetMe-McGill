@@ -140,10 +140,10 @@ function OwnerDashboard({ user, onLogout }) {
   const handleAcceptRequest = async (request_id) => {
     try{ //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
       await apiPost("accept_request.php", {request_id})
-    
       setRequests(prev =>
-        prev.map(r => r.id === request_id ? { ...r, status: 'accepted' } : r)
+        prev.filter(r => r.id !== request_id)
       )
+      apiGet("owner_slots.php").then(d => setSlots(d.slots || []))
     } catch(err) {
       alert(err.message)
     }
@@ -154,7 +154,7 @@ function OwnerDashboard({ user, onLogout }) {
     try { //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
       await apiPost("decline_request.php", {request_id})
       setRequests(prev =>
-        prev.map(r => r.id === request_id ? { ...r, status: 'declined' } : r)
+        prev.filter(r => r.id !== request_id)
       )
     } catch(err){
       alert(err.message)
@@ -380,9 +380,11 @@ function OwnerDashboard({ user, onLogout }) {
                   <tr>
                     <th>From</th>
                     <th>Email</th>
+                    <th>Title</th>
                     <th>Message</th>
-                    <th>Status</th>
-                    <th>Date</th>
+                    <th>Suggested Date</th>
+                    <th>Start</th>
+                    <th>End</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -393,16 +395,14 @@ function OwnerDashboard({ user, onLogout }) {
                       <td>
                         <a href={`mailto:${req.requester_email}`}>{req.requester_email}</a>
                       </td>
+                      <td>{req.title}</td>
                       <td>{req.message}</td>
-                      <td>{req.status}</td>
-                      <td>{req.created_at}</td>
+                      <td>{req.requested_date}</td>
+                      <td>{req.requested_start}</td>
+                      <td>{req.requested_end}</td>
                       <td>
-                        {req.status === "pending" && (
-                          <>
-                            <button onClick={() => handleAcceptRequest(req.id)}>Accept</button>
-                            <button onClick={() => handleDeclineRequest(req.id)}>Decline</button>
-                          </>
-                        )}
+                        <button onClick={() => handleAcceptRequest(req.id)}>Accept</button>
+                        <button onClick={() => handleDeclineRequest(req.id)}>Decline</button>
                       </td>
                     </tr>
                   ))}

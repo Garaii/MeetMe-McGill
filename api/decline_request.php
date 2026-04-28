@@ -33,11 +33,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $db = get_db();
     // connect to database
 
-    // update request only if it belongs to this owner
+    // update request only if it belongs to this owner and is still pending
     $stmt = $db->prepare("
         UPDATE meeting_requests
         SET status = 'declined'
-        WHERE id = ? AND owner_id = ?
+        WHERE id = ? AND owner_id = ? AND status = 'pending'
     ");
 
     $stmt->execute([(int)$request_id, $owner_id]);
@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "message" => $success
         ]);
     } else {
-        $error = "Request not found.";
+        $error = "Request not found or already handled.";
 
         send_json([
             "success" => false,

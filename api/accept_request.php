@@ -2,15 +2,14 @@
 require_once "bootstrap.php";
 require_once "auth.php";
 
-// TODO: STILL NEED TO UPDATE THIS: WHEN ACCEPTED A BOOKING SLOT SHOULD BE CREATED, USER SHOULD SEE THE APOINTMENT, OWNER SHOULD ALSO SEE IT
 require_owner();
-// only owners can accept requests sent to them
+// only logged-in owners can accept meeting requests
 
 $error = "";
 $success = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // only run if form was submitted
+    // only run if request was submitted
 
     $owner_id = current_user_id();
     // get logged-in owner's ID from session
@@ -19,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // read JSON data sent by React
 
     $request_id = $data["request_id"] ?? "";
-    // get request ID from form
+    // get meeting request ID from React
 
     if ($request_id === "") {
         // check if request ID is missing
@@ -34,30 +33,123 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $db = get_db();
     // connect to database
 
-    // update request only if it belongs to this owner
+    // get the meeting request and make sure it belongs to this owner
     $stmt = $db->prepare("
-        UPDATE meeting_requests
-        SET status = 'accepted'
+        SELECT
+            id,
+            requester_id,
+            owner_id,
+            title,
+            message,
+            requested_start,
+            requested_end,
+            status
+        FROM meeting_requests
         WHERE id = ? AND owner_id = ?
     ");
 
-    $stmt->execute([(int)$request_id, $owner_id]);
-    // run update query
+    $stmt->execute([
+        (int)$request_id,
+        $owner_id
+    ]);
+    // run query
 
-    if ($stmt->rowCount() === 1) {
-        $success = "Meeting request accepted.";
+    $request = $stmt->fetch();
+    // get query result
 
-        send_json([
-            "success" => true,
-            "message" => $success
-        ]);
-    } else {
-        $error = "Request not found.";
+    if (!$request) {
+        // stop if request was not found or does not belong to this owner
+        $error = "Meeting request not found.";
 
         send_json([
             "success" => false,
             "message" => $error
         ], 404);
+    }
+
+    if ($request["status"] !== "pending") {
+        // stop if request was already accepted or declined
+        $error = "This request has already been handled.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 400);
+    }
+
+    try {
+        $db->beginTransaction();
+        // start transaction so all database changes happen together
+
+        // create an appointment slot from the requested time
+        $slot_stmt = $db->prepare("
+            INSERT INTO slots
+                (owner_id, title, description, start_time, end_time, is_active, slot_type)
+            VALUES
+                (?, ?, ?, ?, ?, 0, 'request')
+        ");
+
+        $slot_stmt->execute([
+            $owner_id,
+            $request["title"],
+            $request["message"],
+            $request["requested_start"],
+            $request["requested_end"]
+        ]);
+        // insert slot into database
+
+        $slot_id = $db->lastInsertId();
+        // get newly created slot ID
+
+        // book the new slot for the student who requested the meeting
+        $booking_stmt = $db->prepare("
+            INSERT INTO bookings
+                (slot_id, user_id, status)
+            VALUES
+                (?, ?, 'booked')
+        ");
+
+        $booking_stmt->execute([
+            (int)$slot_id,
+            (int)$request["requester_id"]
+        ]);
+        // insert booking into database
+
+        // update the original meeting request status
+        $update_stmt = $db->prepare("
+            UPDATE meeting_requests
+            SET status = 'accepted'
+            WHERE id = ? AND owner_id = ?
+        ");
+
+        $update_stmt->execute([
+            (int)$request_id,
+            $owner_id
+        ]);
+        // mark request as accepted
+
+        $db->commit();
+        // save all database changes
+
+        $success = "Meeting request accepted and appointment created.";
+
+        send_json([
+            "success" => true,
+            "message" => $success,
+            "slot_id" => (int)$slot_id
+        ]);
+
+    } catch (Exception $e) {
+        $db->rollBack();
+        // undo database changes if something failed
+
+        $error = "Failed to accept meeting request.";
+
+        send_json([
+            "success" => false,
+            "message" => $error,
+            "error" => $e->getMessage()
+        ], 500);
     }
 }
 
