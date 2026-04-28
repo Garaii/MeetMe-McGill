@@ -119,10 +119,10 @@ function OwnerDashboard({ user, onLogout }) {
   const handleDeleteSlot = async (slot) => {
     if (!window.confirm('Delete this slot?')) return
     try{ //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
-      await apiPost("delete_slot.php", {slot_id: slot.id})
+      const  data = await apiPost("delete_slot.php", {slot_id: slot.id})
     //IF THE SLOT IS BOOKED WE NOTIFY USER  
-      if (slot.booked_by_email) {
-      window.location.href = `mailto:${slot.booked_by_email}?subject=Booking Cancelled&body=Hi, your booking slot has been deleted by the owner.`
+      if (data.booked_by_email) {
+      window.location.href = `mailto:${data.booked_by_email}?subject=Booking Cancelled&body=Hi, your booking slot has been deleted by the owner.`
     }
     setSlots(prev => prev.filter(s => s.id !== slot.id))
     } catch(err) {

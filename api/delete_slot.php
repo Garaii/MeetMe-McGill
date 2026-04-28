@@ -55,22 +55,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // check whether this slot is already booked
     $check = $db->prepare("
-        SELECT id
+        SELECT bookings.id, users.email AS booked_user_email
         FROM bookings
-        WHERE slot_id = ?
+        INNER JOIN users ON bookings.user_id = users.id
+        WHERE bookings.slot_id = ?
     ");
 
     $check->execute([(int)$slot_id]);
     $booking = $check->fetch();
 
     if ($booking) {
-        // do not delete booked slots
-        $error = "Cannot delete a booked slot.";
-
-        send_json([
-            "success" => false,
-            "message" => $error
-        ], 400);
+        // delete booking then send email
+        $deleteBooking = $db->prepare("DELETE FROM bookings WHERE slot_id = ?");
+        $deleteBooking->execute([(int)$slot_id]);
     }
 
     // delete the slot
@@ -84,7 +81,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         send_json([
             "success" => true,
-            "message" => $success
+            "message" => $success,
+            "booked_user_email" => $booking ? $booking["booked_user_email"] : null
         ]);
     } else {
         $error = "Failed to delete slot.";
