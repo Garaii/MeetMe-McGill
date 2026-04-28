@@ -131,7 +131,11 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
       const data = await apiPost("cancel_booking.php", { booking_id: booking.booking_id})
 
       if(data.owner_email){
-        window.location.href= `mailto:${data.owner_email}?subject=Booking Cancelled&body=Hi, I have cancelled my booking.`
+          const body = encodeURIComponent(
+        `Hi ${data.owner_name || ''},\n\nThis is to let you know that ${user.name} has cancelled their booking.\n\nThe slot is now available again.\n\nThank you!`
+        )
+        const subject = encodeURIComponent('Booking Cancelled')
+        window.location.href = `mailto:${data.owner_email}?subject=${subject}&body=${body}`
       }
 
       setBookings( prev => prev.filter (b=> b.booking_id !== booking.booking_id))
