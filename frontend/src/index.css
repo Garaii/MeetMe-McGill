@@ -327,7 +327,7 @@ button:hover {
   gap: 10px;
   padding: 10px 16px;
   background: var(--accent-light);
-  border: 1px solid #fca5a5;
+  border: 1px solid #e5e7eb;
   border-radius: var(--radius);
   margin: 16px 0;
   font-size: 13px;
