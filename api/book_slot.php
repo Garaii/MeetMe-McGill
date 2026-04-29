@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // check that this slot exists, is active, and is not owned by the current user
     $stmt = $db->prepare("
-        SELECT id, owner_id, is_active
+        SELECT id, owner_id, is_active, slot_type
         FROM slots
         WHERE id = ?
     ");
@@ -51,6 +51,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "success" => false,
             "message" => $error
         ], 404);
+    }
+
+    if ($slot["slot_type"] === "group") {
+        // group meetings use group_attendees, not normal bookings
+        $error = "Group meetings cannot be booked from this page.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 400);
     }
 
     if ((int)$slot["is_active"] !== 1) {

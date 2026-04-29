@@ -19,9 +19,10 @@ $stmt = $db->prepare("
         s.id,
         s.title,
         CASE
-            WHEN s.title IS NOT NULL AND s.title !='' THEN 'group'
+            WHEN s.slot_type = 'group' THEN 'group'
             ELSE 'manual'
         END AS slot_type,
+        COALESCE(s.location, '') AS location,
         date(s.start_time) AS slot_date,
         substr(time(s.start_time), 1, 5) AS start_time,
         substr(time(s.end_time), 1, 5) AS end_time,

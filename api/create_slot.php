@@ -29,6 +29,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $title = $data["title"] ?? "Available slot";
     // use default title if none was sent
 
+    $location = trim($data["location"] ?? "");
+    // get location from form
+
     if ($slot_date === "" || $start_time === "" || $end_time === "") {
         // check if any field is empty
         $error = "All fields are required.";
@@ -66,12 +69,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         // insert new slot into database
         $stmt = $db->prepare("
-            INSERT INTO slots (owner_id, title, start_time, end_time, is_active)
-            VALUES (?, ?, ?, ?, 0)
+            INSERT INTO slots (owner_id, title, location, start_time, end_time, is_active)
+            VALUES (?, ?, ?, ?, ?, 0)
         ");
         // is_active = 0 means private/inactive by default
 
-        if ($stmt->execute([$owner_id, $title, $start_datetime, $end_datetime])) {
+        if ($stmt->execute([$owner_id, $title, $location, $start_datetime, $end_datetime])) {
             $success = "Booking slot created successfully. It is currently private.";
 
             send_json([

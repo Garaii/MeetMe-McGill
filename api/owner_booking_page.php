@@ -53,6 +53,7 @@ $slots = [];
 $slot_stmt = $db->prepare("
     SELECT
         s.id,
+        COALESCE(s.location, '') AS location,
         date(s.start_time) AS slot_date,
         substr(time(s.start_time), 1, 5) AS start_time,
         substr(time(s.end_time), 1, 5) AS end_time

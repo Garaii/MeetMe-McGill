@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
     // connect to database
 
     $stmt = $db->prepare("
-        SELECT id, title, description, status, created_at
+        SELECT id, title, description, location, status, created_at
         FROM group_meetings
         WHERE owner_id = ?
         ORDER BY created_at DESC
@@ -48,6 +48,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $description = trim($data["description"] ?? "");
     // get optional description
+
+    $location = trim($data["location"] ?? "");
+    // get optional location
 
     $options = $data["options"] ?? [];
     // get all submitted options as an array
@@ -124,11 +127,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             // insert group meeting first
             $meeting_stmt = $db->prepare("
-                INSERT INTO group_meetings (owner_id, title, description)
-                VALUES (?, ?, ?)
+                INSERT INTO group_meetings (owner_id, title, description, location)
+                VALUES (?, ?, ?, ?)
             ");
 
-            $meeting_stmt->execute([$owner_id, $title, $description]);
+            $meeting_stmt->execute([$owner_id, $title, $description, $location]);
             // run insert query
 
             $group_meeting_id = $db->lastInsertId();
@@ -165,6 +168,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     "id" => (int)$group_meeting_id,
                     "title" => $title,
                     "description" => $description,
+                    "location" => $location,
                     "status" => "open"
                 ]
             ]);

@@ -24,7 +24,7 @@ $db = get_db();
 
 // check that this group meeting belongs to the current owner
 $meeting_stmt = $db->prepare("
-    SELECT id, title, description, status
+    SELECT id, title, description, location, status
     FROM group_meetings
     WHERE id = ? AND owner_id = ?
 ");
@@ -67,10 +67,25 @@ $count_stmt->execute([(int)$group_meeting_id]);
 $options = $count_stmt->fetchAll();
 // get query result
 
+$attendee_stmt = $db->prepare("
+    SELECT u.name, u.email
+    FROM group_attendees ga
+    JOIN users u ON ga.user_id = u.id
+    WHERE ga.group_id = ?
+    ORDER BY u.name
+");
+
+$attendee_stmt->execute([(int)$group_meeting_id]);
+// run query
+
+$attendees = $attendee_stmt->fetchAll();
+// get attendee result
+
 send_json([
     "success" => true,
     "meeting" => $meeting,
-    "options" => $options
+    "options" => $options,
+    "attendees" => $attendees
 ]);
 // send vote counts back to React
 ?>

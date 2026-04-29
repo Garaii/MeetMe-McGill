@@ -41,7 +41,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             go.end_time,
             gm.id AS group_meeting_id,
             gm.owner_id,
-            gm.title
+            gm.title,
+            gm.description,
+            gm.location,
+            gm.status
         FROM group_options go
         JOIN group_meetings gm ON go.group_id = gm.id
         WHERE go.id = ? AND gm.owner_id = ?
@@ -66,27 +69,60 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
     // stop if option does not belong to current owner
 
-    // insert final chosen option into slots table
-    $insert = $db->prepare("
-        INSERT INTO slots (owner_id, title, start_time, end_time, is_active, slot_type)
-        VALUES (?, ?, ?, ?, 1, 'group')
-    ");
-    // is_active = 1 means the final meeting is active/public
+    if ($option["status"] === "finalized") {
+        // do not finalize the same group meeting twice
+        $error = "This group meeting has already been finalized.";
 
-    if ($insert->execute([
-        $owner_id,
-        $option["title"],
-        $option["start_time"],
-        $option["end_time"]
-    ])) {
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 400);
+    }
+
+    try {
+        $db->beginTransaction();
+        // start transaction so everything happens together
+
+        // insert final chosen option into slots table
+        $insert = $db->prepare("
+            INSERT INTO slots (owner_id, title, description, location, start_time, end_time, is_active, slot_type)
+            VALUES (?, ?, ?, ?, ?, ?, 1, 'group')
+        ");
+        // is_active = 1 means the final meeting is active/public
+
+        $insert->execute([
+            $owner_id,
+            $option["title"],
+            $option["description"],
+            $option["location"],
+            $option["start_time"],
+            $option["end_time"]
+        ]);
+        // run insert query
+
         $slot_id = $db->lastInsertId();
         // get newly created slot ID
+
+        // add everyone who voted for this option as an attendee
+        $attendee_stmt = $db->prepare("
+            INSERT OR IGNORE INTO group_attendees (group_id, slot_id, user_id)
+            SELECT ?, ?, user_id
+            FROM group_votes
+            WHERE option_id = ?
+        ");
+
+        $attendee_stmt->execute([
+            (int)$option["group_meeting_id"],
+            (int)$slot_id,
+            (int)$option_id
+        ]);
+        // run attendee insert query
 
         // mark the group meeting as finalized
         $update = $db->prepare("
             UPDATE group_meetings
             SET status = 'finalized', finalized_option_id = ?
-            WHERE id = ? AND owner_id = ?
+            WHERE id = ? AND owner_id = ? AND status != 'finalized'
         ");
 
         $update->execute([
@@ -96,14 +132,32 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ]);
         // run update query
 
-        $success = "Group meeting finalized and slot created.";
+        if ($update->rowCount() !== 1) {
+            $db->rollBack();
+
+            $error = "This group meeting has already been finalized.";
+
+            send_json([
+                "success" => false,
+                "message" => $error
+            ], 400);
+        }
+
+        $db->commit();
+        // save all database changes
+
+        $success = "Group meeting finalized and attendees added.";
 
         send_json([
             "success" => true,
             "message" => $success,
             "slot_id" => (int)$slot_id
         ]);
-    } else {
+
+    } catch (Exception $e) {
+        $db->rollBack();
+        // undo database changes if something failed
+
         $error = "Failed to finalize group meeting.";
 
         send_json([

@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // check that this slot belongs to the current owner
     $stmt = $db->prepare("
-        SELECT id
+        SELECT id, slot_type
         FROM slots
         WHERE id = ? AND owner_id = ?
     ");
@@ -65,10 +65,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $booking = $check->fetch();
 
     if ($booking) {
-        // delete booking then send email
-        $deleteBooking = $db->prepare("DELETE FROM bookings WHERE slot_id = ?");
-        $deleteBooking->execute([(int)$slot_id]);
+        // do not delete booked normal slots
+        $error = "Cannot delete a booked slot.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 400);
     }
+
+    // delete group attendees if this is a group slot
+    $delete_attendees = $db->prepare("
+        DELETE FROM group_attendees
+        WHERE slot_id = ?
+    ");
+
+    $delete_attendees->execute([(int)$slot_id]);
+    // run delete query
 
     // delete the slot
     $delete = $db->prepare("
@@ -81,8 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         send_json([
             "success" => true,
-            "message" => $success,
-            "booked_user_email" => $booking ? $booking["booked_user_email"] : null
+            "message" => $success
         ]);
     } else {
         $error = "Failed to delete slot.";
