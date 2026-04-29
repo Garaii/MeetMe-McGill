@@ -52,7 +52,7 @@ function RegisterPage({onRegistered, onGoLogin}) {
     }
   }
 
-  return (   
+  return (  
     <div>
       <Navbar onLogin={onGoLogin} onRegister={null} />
 
@@ -141,6 +141,11 @@ function RegisterPage({onRegistered, onGoLogin}) {
           </p>
         </div>
       </div>
+     
+      <div className="footer">
+        © 2026 MeetMe @ McGill — SOCS Booking App
+        </div>
+       
     </div>
   )
 }

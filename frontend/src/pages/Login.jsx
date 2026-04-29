@@ -74,6 +74,10 @@ function LoginPage({onLogin, onGoRegister}) {
           </p>
         </div>
       </div>
+     
+      <div className="footer">
+        © 2026 MeetMe@McGill — SOCS Booking App
+      </div>
     </div>
   )
 }
