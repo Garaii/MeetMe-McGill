@@ -612,9 +612,11 @@ const handleLoadGroupMeeting = async () => {
     )}
    
     {/* APPOINTMENT ACTIONS*/}
-    <div className="dashboard-actions">
-      <button onClick={onLogout}>Logout</button>
-    </div>
+    {/*Footer*/}
+    <footer className="footer">
+        <p>McGill University — SOCS Booking App</p>
+    </footer>
+       
     </div>
   </div>
     
