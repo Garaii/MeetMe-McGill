@@ -791,7 +791,7 @@ function OwnerDashboard({ user, onLogout }) {
         {/* BOTTOM ACTIONS  $$$$$$$$$$$$$$$$$$$$$$$$$$ maybe put this button elsewhere $$$$$$$$$$$$$$$$$$$$$$$$$$$$ */}
         {/*Footer*/}
         <footer className="footer">
-            <p>McGill University — SOCS Booking App</p>
+            <p>© 2026 MeetMe@McGill — SOCS Booking App</p>
         </footer>
         
       </div>
