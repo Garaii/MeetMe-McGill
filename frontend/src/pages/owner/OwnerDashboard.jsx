@@ -318,6 +318,11 @@ function OwnerDashboard({ user, onLogout }) {
       setFinalizeMessage(err.message)
     }
   }
+  /* ++++++++++++++++++----------------GROUPING SLOTS ---------------+++++++++++++ */
+  const groupedSlots = {
+  group: slots.filter(s => s.slot_type === 'group'),
+  manual: slots.filter(s => s.slot_type === 'manual')
+  }
 
   //  ####################################%%%%%%%%%%%%%%%%%%%_____________________ actual UI 
   return (
@@ -364,50 +369,94 @@ function OwnerDashboard({ user, onLogout }) {
         {view === "slots" && (
           <section className="appointments-view">
             <h2>My Slots</h2>
-            {slotsLoading ? (
-              <p>Loading...</p>
-            ) : slots.length === 0 ? (
-              <p>You have no slots yet.</p>
-            ) : (
-              <table className="dashboard-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Start</th>
-                    <th>End</th>
-                    <th>Status</th>
-                    <th>Booked By</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {slots.map(slot => (
-                    <tr key={slot.id}>
-                      <td>{slot.slot_date}</td>
-                      <td>{slot.start_time}</td>
-                      <td>{slot.end_time}</td>
-                      <td>{slot.is_active ? "Active" : "Private"}</td>
-                      <td>{slot.booked_by ?? "Not booked"}</td>
-                      <td>
-                        <button onClick={() => handleToggleVisibility(slot.id, slot.is_active)}>
-                          {slot.is_active ? "Make Private" : "Make Active"}
-                        </button>
-
-                        {slot.booked_by && (
-                          <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
-                        )}
-
-                        <button onClick={() => handleDeleteSlot(slot)}>
-                          Delete
-                        </button>
-                      </td>
+            {slotsLoading ? ( <p>Loading...</p> ) : slots.length === 0 ? ( <p>You have no slots yet.</p> ) : (
+              <>
+              {/* MANUAL / RECURRING SLOTS */}
+              {groupedSlots.manual.length > 0 && (
+              <>
+                <h3 style={{ marginTop: '16px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
+                  Office Hours & Single Slots
+                </h3>
+                <table className="dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Start</th>
+                      <th>End</th>
+                      <th>Status</th>
+                      <th>Booked By</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </section>
-        )}
+                  </thead>
+                  <tbody>
+                    {groupedSlots.manual.map(slot => (
+                      <tr key={slot.id}>
+                        <td>{slot.slot_date}</td>
+                        <td>{slot.start_time}</td>
+                        <td>{slot.end_time}</td>
+                        <td>{slot.is_active ? "Active" : "Private"}</td>
+                        <td>{slot.booked_by ?? "Not booked"}</td>
+                        <td>
+                          <button onClick={() => handleToggleVisibility(slot.id, slot.is_active)}>
+                            {slot.is_active ? "Make Private" : "Make Active"}
+                          </button>
+
+                          {slot.booked_by && (
+                            <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
+                          )}
+
+                          <button onClick={() => handleDeleteSlot(slot)}>
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                </>
+              )}
+
+              {/* GROUP MEETING SLOTS */}
+              {groupedSlots.group.length > 0 && (
+                <>
+                  <h3 style={{ marginTop: '24px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
+                    Group Meeting Slots
+                  </h3>
+                  <table className="dashboard-table">
+                    <thead>
+                      <tr>
+                        <th>Title</th><th>Date</th><th>Start</th><th>End</th>
+                        <th>Status</th><th>Booked By</th><th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {groupedSlots.group.map(slot => (
+                        <tr key={slot.id}>
+                          <td>{slot.title}</td>
+                          <td>{slot.slot_date}</td>
+                          <td>{slot.start_time}</td>
+                          <td>{slot.end_time}</td>
+                          <td>{slot.is_active ? "Active" : "Private"}</td>
+                          <td>{slot.booked_by ?? "Not booked"}</td>
+                          <td>
+                            <button onClick={() => handleToggleVisibility(slot.id, slot.is_active)}>
+                              {slot.is_active ? "Make Private" : "Make Active"}
+                            </button>
+                            {slot.booked_by && (
+                              <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
+                            )}
+                            <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </>
+              )}
+            </>
+          )}
+        </section>
+      )}
 
         {/* ── MEETING REQUESTS ── */}
         {view === "requests" && (

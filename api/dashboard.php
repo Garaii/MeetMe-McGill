@@ -17,6 +17,11 @@ $db = get_db();
 $stmt = $db->prepare("
     SELECT
         b.id AS booking_id,
+        s.title,
+        CASE
+            WHEN s.title IS NOT NULL s.title !='' THEN 'group'
+            ELSE 'manual'
+        END AS slot_type
         date(s.start_time) AS slot_date,
         substr(time(s.start_time), 1, 5) AS start_time,
         substr(time(s.end_time), 1, 5) AS end_time,

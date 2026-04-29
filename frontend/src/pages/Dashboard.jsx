@@ -237,6 +237,13 @@ const handleLoadGroupMeeting = async () => {
       setGroupLoading(false)
     }
   }
+  /* ______________________ GROUPING BOOKINGS ___________________ */
+  const groupedBookings = {
+  group: bookings.filter(b => b.slot_type === 'group'),
+  manual: bookings.filter(b => b.slot_type === 'manual')
+  }
+
+
 
   /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&_______________________ ui __________________&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& */
   return (
@@ -313,42 +320,76 @@ const handleLoadGroupMeeting = async () => {
 
         {/* HERE TO DISPLAY BOOKINGS AS A TABLE, WILL HAVE TO STYLE */}
         {!bookingsLoading && bookings.length > 0 && (
-          <table className='dashboard-table'>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Start</th>
-                <th>End</th>
-                <th>Owner</th> 
-                <th>Actions</th>
-              </tr>
-            </thead>
+          <>
+            <h3 style={{ marginTop: '16px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
+              Booked Appointments
+            </h3>
+            <table className='dashboard-table'>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Owner</th> 
+                  <th>Actions</th>
+                </tr>
+              </thead>
 
+              <tbody>
+                {/*.sort((a, b) => new Date(a.slot_date) - new Date(b.slot_date)) */}
+                {groupedBookings.manual.map(booking => (
+                  <tr key={booking.booking_id}>
+                    <td>{booking.slot_date}</td>
+                    <td>{booking.start_time}</td>
+                    <td>{booking.end_time}</td>
+                    <td>{booking.owner_name}</td>
+
+                    <td>
+                      <a href={`mailto:${booking.owner_email}`}>
+                        <button>Email Owner</button>
+                      </a>
+                      <button onClick={()=> handleCancelBooking(booking)}>
+                        Cancel
+                      </button>
+
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+
+        {!bookingsLoading && groupedBookings.group.length > 0 && (
+        <>
+          <h3 style={{ marginTop: '24px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
+            Group Meeting Appointments
+          </h3>
+          <table className="dashboard-table">
+            <thead>
+              <tr><th>Title</th><th>Date</th><th>Start</th><th>End</th><th>Owner</th><th>Actions</th></tr>
+            </thead>
             <tbody>
-              {bookings.map(booking => (
+              {groupedBookings.group.map(booking => (
                 <tr key={booking.booking_id}>
+                  <td>{booking.title}</td>
                   <td>{booking.slot_date}</td>
                   <td>{booking.start_time}</td>
                   <td>{booking.end_time}</td>
                   <td>{booking.owner_name}</td>
-
                   <td>
-                    <a href={`mailto:${booking.owner_email}`}>
-                      <button>Email Owner</button>
-                    </a>
-                    <button onClick={()=> handleCancelBooking(booking)}>
-                      Cancel
-                    </button>
-
+                    <a href={`mailto:${booking.owner_email}`}><button>Email Owner</button></a>
+                    <button onClick={() => handleCancelBooking(booking)}>Cancel</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        )}
+        </>
+      )}
 
-      </section>
-    )}
+    </section>
+  )}
 
     {/* NEW APPOINTMENTS ------------- BROWSE OWNERS */}
     {view === "browse" && (
