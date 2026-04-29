@@ -320,8 +320,10 @@ function OwnerDashboard({ user, onLogout }) {
   }
   /* ++++++++++++++++++----------------GROUPING SLOTS ---------------+++++++++++++ */
   const groupedSlots = {
-  group: slots.filter(s => s.slot_type === 'group'),
-  manual: slots.filter(s => s.slot_type === 'manual')
+  recurring: slots.filter(s => s.title === 'Recurring office hours'),
+  requested: slots.filter(s => s.title === 'Meeting request'),
+  available: slots.filter(s => s.title === 'Available slot'),
+  group: slots.filter(s => !['Recurring office hours', 'Meeting request', 'Available slot'].includes(s.title))
   }
 
   //  ####################################%%%%%%%%%%%%%%%%%%%_____________________ actual UI 
@@ -375,7 +377,7 @@ function OwnerDashboard({ user, onLogout }) {
               {groupedSlots.manual.length > 0 && (
               <>
                 <h3 style={{ marginTop: '16px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
-                  Office Hours & Single Slots
+                  Single Slots
                 </h3>
                 <table className="dashboard-table">
                   <thead>
@@ -389,7 +391,7 @@ function OwnerDashboard({ user, onLogout }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {groupedSlots.manual.map(slot => (
+                    {groupedSlots.available.map(slot => (
                       <tr key={slot.id}>
                         <td>{slot.slot_date}</td>
                         <td>{slot.start_time}</td>
