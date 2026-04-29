@@ -65,13 +65,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $booking = $check->fetch();
 
     if ($booking) {
-        // do not delete booked normal slots
-        $error = "Cannot delete a booked slot.";
-
-        send_json([
-            "success" => false,
-            "message" => $error
-        ], 400);
+        // delete booking then send email
+        $deleteBooking = $db->prepare("DELETE FROM bookings WHERE slot_id = ?");
+        $deleteBooking->execute([(int)$slot_id]);
     }
 
     // delete group attendees if this is a group slot
@@ -94,7 +90,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         send_json([
             "success" => true,
-            "message" => $success
+            "message" => $success,
+            "booked_user_email" => $booking ? $booking["booked_user_email"] : null
         ]);
     } else {
         $error = "Failed to delete slot.";

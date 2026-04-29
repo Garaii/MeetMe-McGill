@@ -476,11 +476,9 @@ function OwnerDashboard({ user, onLogout }) {
                             <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                           )}
 
-                          {!slot.booked_by && (
-                            <button onClick={() => handleDeleteSlot(slot)}>
-                              Delete
-                            </button>
-                          )}
+                          <button onClick={() => handleDeleteSlot(slot)}>
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -519,9 +517,7 @@ function OwnerDashboard({ user, onLogout }) {
                             {slot.booked_by && (
                               <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                             )}
-                            {!slot.booked_by && (
-                              <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
-                            )}
+                            <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
                           </td>
                         </tr>
                       ))}
@@ -560,9 +556,7 @@ function OwnerDashboard({ user, onLogout }) {
                             {slot.booked_by && (
                               <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                             )}
-                            {!slot.booked_by && (
-                              <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
-                            )}
+                            <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
                           </td>
                         </tr>
                       ))}
@@ -603,9 +597,7 @@ function OwnerDashboard({ user, onLogout }) {
                             {slot.booked_by && (
                               <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                             )}
-                            {!slot.booked_by && (
-                              <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
-                            )}
+                            <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
                           </td>
                         </tr>
                       ))}
