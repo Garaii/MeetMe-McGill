@@ -125,6 +125,8 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
 
   /* _______________________________________ CANCELING BOOKING FUNCTION __________________________________ */
   const handleCancelBooking = async (booking) => {
+    if (booking.can_cancel === 0 || booking.can_cancel === "0") return
+
     // will have to update appearance of this
     if(!window.confirm("Cancel this booking?")) return
     try {
@@ -331,6 +333,7 @@ const handleLoadGroupMeeting = async () => {
                   <th>Start</th>
                   <th>End</th>
                   <th>Owner</th> 
+                  <th>Location</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -343,14 +346,17 @@ const handleLoadGroupMeeting = async () => {
                     <td>{booking.start_time}</td>
                     <td>{booking.end_time}</td>
                     <td>{booking.owner_name}</td>
+                    <td>{booking.location || "Not specified"}</td>
 
                     <td>
                       <a href={`mailto:${booking.owner_email}`}>
                         <button>Email Owner</button>
                       </a>
-                      <button onClick={()=> handleCancelBooking(booking)}>
-                        Cancel
-                      </button>
+                      {(booking.can_cancel !== 0 && booking.can_cancel !== "0") && (
+                        <button onClick={()=> handleCancelBooking(booking)}>
+                          Cancel
+                        </button>
+                      )}
 
                     </td>
                   </tr>
@@ -367,7 +373,7 @@ const handleLoadGroupMeeting = async () => {
           </h3>
           <table className="dashboard-table">
             <thead>
-              <tr><th>Title</th><th>Date</th><th>Start</th><th>End</th><th>Owner</th><th>Actions</th></tr>
+              <tr><th>Title</th><th>Date</th><th>Start</th><th>End</th><th>Owner</th><th>Location</th><th>Actions</th></tr>
             </thead>
             <tbody>
               {groupedBookings.group.map(booking => (
@@ -377,9 +383,14 @@ const handleLoadGroupMeeting = async () => {
                   <td>{booking.start_time}</td>
                   <td>{booking.end_time}</td>
                   <td>{booking.owner_name}</td>
+                  <td>{booking.location || "Not specified"}</td>
                   <td>
                     <a href={`mailto:${booking.owner_email}`}><button>Email Owner</button></a>
-                    <button onClick={() => handleCancelBooking(booking)}>Cancel</button>
+                    {(booking.can_cancel !== 0 && booking.can_cancel !== "0") ? (
+                      <button onClick={() => handleCancelBooking(booking)}>Cancel</button>
+                    ) : (
+                      <span>Group meeting</span>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -455,6 +466,7 @@ const handleLoadGroupMeeting = async () => {
                     <th>Date</th>
                     <th>Start</th>
                     <th>End</th>
+                    <th>Location</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -464,6 +476,7 @@ const handleLoadGroupMeeting = async () => {
                       <td>{slot.slot_date}</td>
                       <td>{slot.start_time}</td>
                       <td>{slot.end_time}</td>
+                      <td>{slot.location || "Not specified"}</td>
                       <td>
                         <button
                           className="btn-primary"
@@ -583,6 +596,7 @@ const handleLoadGroupMeeting = async () => {
               <h3>{groupMeeting.title}</h3>
               {groupMeeting.description && <p>{groupMeeting.description}</p>}
               <p>Organized by: <strong>{groupMeeting.owner_name}</strong></p>
+              <p>Location: <strong>{groupMeeting.location || "Not specified"}</strong></p>
 
               <p>Select the times that work for you:</p>
               {groupOptions.map(option => (

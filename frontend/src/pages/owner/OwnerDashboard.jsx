@@ -19,6 +19,7 @@ function OwnerDashboard({ user, onLogout }) {
   const [slotDate, setSlotDate] = useState('')
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
+  const [slotLocation, setSlotLocation] = useState('')
   const [slotError, setSlotError] = useState('')
   const [slotSuccess, setSlotSuccess] = useState('')
   const [slotLoading, setSlotLoading] = useState(false)
@@ -26,6 +27,7 @@ function OwnerDashboard({ user, onLogout }) {
   // Create group meeting form state
   const [meetingTitle, setMeetingTitle] = useState('')
   const [meetingDescription, setMeetingDescription] = useState('')
+  const [meetingLocation, setMeetingLocation] = useState('')
   const [meetingOptions, setMeetingOptions] = useState([
     { option_date: '', start_time: '', end_time: '' },
     { option_date: '', start_time: '', end_time: '' },
@@ -38,6 +40,7 @@ function OwnerDashboard({ user, onLogout }) {
   const [groupMeetings, setGroupMeetings] = useState([])
   const [selectedMeeting, setSelectedMeeting] = useState(null)
   const [meetingVotes, setMeetingVotes] = useState([])
+  const [groupAttendees, setGroupAttendees] = useState([])
   const [votesLoading, setVotesLoading] = useState(false)
   const [finalizeMessage, setFinalizeMessage] = useState('')
 
@@ -50,6 +53,8 @@ function OwnerDashboard({ user, onLogout }) {
   const [recurStart, setRecurStart] = useState('')
   const [recurEnd, setRecurEnd] = useState('')
   const [recurWeeks, setRecurWeeks] = useState('')
+  const [recurLocation, setRecurLocation] = useState('')
+  const [recurringBatches, setRecurringBatches] = useState([])
   const [recurError, setRecurError] = useState('')
   const [recurSuccess, setRecurSuccess] = useState('')
   const [recurLoading, setRecurLoading] = useState(false)
@@ -84,13 +89,22 @@ function OwnerDashboard({ user, onLogout }) {
   }
 
   // ======================== Fetch group meetings
-  /*const fetchGroupMeetings = () => {
+  const fetchGroupMeetings = () => {
     apiGet('create_group_meeting.php')
       .then(data => {
         setGroupMeetings(data.meetings || [])
       })
       .catch(() => {})
-  }*/
+  }
+
+  // ======================== Fetch recurring batches
+  const fetchRecurringBatches = () => {
+    apiGet('create_recurring_office_hours.php')
+      .then(data => {
+        setRecurringBatches(data.batches || [])
+      })
+      .catch(() => {})
+  }
 
   // ___________ COPY invite URL to Clipboard
   const handleCopyInvite = () => {
@@ -186,13 +200,15 @@ function OwnerDashboard({ user, onLogout }) {
       const data = await apiPost("create_slot.php", {
         slot_date: slotDate,
         start_time: startTime,
-        end_time: endTime
+        end_time: endTime,
+        location: slotLocation
       })
 
       setSlotSuccess(data.message)
       setSlotDate('')
       setStartTime('')
       setEndTime('')
+      setSlotLocation('')
 
       // Refresh slots list
       apiGet("owner_slots.php").then(d => setSlots(d.slots || []))
@@ -214,7 +230,8 @@ function OwnerDashboard({ user, onLogout }) {
         weekday: recurWeekday,
         start_time: recurStart,
         end_time: recurEnd,
-        weeks: recurWeeks
+        weeks: recurWeeks,
+        location: recurLocation
       })
 
       setRecurSuccess(data.message)
@@ -222,12 +239,47 @@ function OwnerDashboard({ user, onLogout }) {
       setRecurStart('')
       setRecurEnd('')
       setRecurWeeks('')
+      setRecurLocation('')
 
       apiGet("owner_slots.php").then(d => setSlots(d.slots || []))
+      fetchRecurringBatches()
     } catch (err) {
       setRecurError(err.message)
     } finally {
       setRecurLoading(false)
+    }
+  }
+
+  // ____________________________ toggle recurring batch active/private
+  const handleToggleBatch = async (batch) => {
+    try {
+      await apiPost("create_recurring_office_hours.php", {
+        action: "toggle_batch",
+        batch_id: batch.id,
+        is_active: batch.is_active ? 0 : 1
+      })
+
+      fetchRecurringBatches()
+      apiGet("owner_slots.php").then(d => setSlots(d.slots || []))
+    } catch (err) {
+      setRecurError(err.message)
+    }
+  }
+
+  // ____________________________ delete recurring batch
+  const handleDeleteBatch = async (batch) => {
+    if (!window.confirm('Delete this recurring batch?')) return
+
+    try {
+      await apiPost("create_recurring_office_hours.php", {
+        action: "delete_batch",
+        batch_id: batch.id
+      })
+
+      fetchRecurringBatches()
+      apiGet("owner_slots.php").then(d => setSlots(d.slots || []))
+    } catch (err) {
+      setRecurError(err.message)
     }
   }
 
@@ -256,6 +308,7 @@ function OwnerDashboard({ user, onLogout }) {
       const data = await apiPost("create_group_meeting.php", {
         title: meetingTitle,
         description: meetingDescription,
+        location: meetingLocation,
         options: meetingOptions
       })
 
@@ -269,10 +322,11 @@ function OwnerDashboard({ user, onLogout }) {
       window.location.href = `mailto:?subject=${subject}&body=${body}`
 
       // Add to local list so owner can view votes right away
-      setGroupMeetings(prev => [...prev, { id: data.group_meeting_id, title: meetingTitle }])
+      setGroupMeetings(prev => [...prev, { id: data.group_meeting_id, title: meetingTitle, location: meetingLocation }])
             
       setMeetingTitle('')
       setMeetingDescription('')
+      setMeetingLocation('')
       setMeetingOptions([
         { option_date: '', start_time: '', end_time: '' },
         { option_date: '', start_time: '', end_time: '' },
@@ -288,6 +342,7 @@ function OwnerDashboard({ user, onLogout }) {
   const handleViewVotes = async (meeting) => {
     setSelectedMeeting(meeting)
     setMeetingVotes([])
+    setGroupAttendees([])
     setFinalizeMessage('')
     setVotesLoading(true)
     setView("view_votes")
@@ -295,6 +350,7 @@ function OwnerDashboard({ user, onLogout }) {
     try {
       const data = await apiGet(`view_group_counts.php?group_meeting_id=${meeting.id}`)
       setMeetingVotes(data.options || [])
+      setGroupAttendees(data.attendees || [])
     } catch (err) {
       setFinalizeMessage(err.message)
     } finally {
@@ -313,6 +369,16 @@ function OwnerDashboard({ user, onLogout }) {
       setFinalizeMessage(data.message)
 
       apiGet("owner_slots.php").then(d => setSlots(d.slots || []))
+      fetchGroupMeetings()
+
+      if (selectedMeeting) {
+        apiGet(`view_group_counts.php?group_meeting_id=${selectedMeeting.id}`)
+          .then(d => {
+            setMeetingVotes(d.options || [])
+            setGroupAttendees(d.attendees || [])
+          })
+          .catch(() => {})
+      }
       
     } catch (err) {
       setFinalizeMessage(err.message)
@@ -358,11 +424,11 @@ function OwnerDashboard({ user, onLogout }) {
             Create Group Meeting
           </button>
 
-          <button className="appt-tab-btn" onClick={() => { setView("group_meetings") }}>
+          <button className="appt-tab-btn" onClick={() => { setView("group_meetings"); fetchGroupMeetings() }}>
             View Group Votes
           </button>
 
-          <button className="appt-tab-btn" onClick={() => setView("recurring")}>
+          <button className="appt-tab-btn" onClick={() => { setView("recurring"); fetchRecurringBatches() }}>
             Recurring Office Hours
           </button>
         </div>
@@ -386,6 +452,7 @@ function OwnerDashboard({ user, onLogout }) {
                       <th>Date</th>
                       <th>Start</th>
                       <th>End</th>
+                      <th>Location</th>
                       <th>Status</th>
                       <th>Booked By</th>
                       <th>Actions</th>
@@ -397,6 +464,7 @@ function OwnerDashboard({ user, onLogout }) {
                         <td>{slot.slot_date}</td>
                         <td>{slot.start_time}</td>
                         <td>{slot.end_time}</td>
+                        <td>{slot.location || "Not specified"}</td>
                         <td>{slot.is_active ? "Active" : "Private"}</td>
                         <td>{slot.booked_by ?? "Not booked"}</td>
                         <td>
@@ -408,9 +476,11 @@ function OwnerDashboard({ user, onLogout }) {
                             <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                           )}
 
-                          <button onClick={() => handleDeleteSlot(slot)}>
-                            Delete
-                          </button>
+                          {!slot.booked_by && (
+                            <button onClick={() => handleDeleteSlot(slot)}>
+                              Delete
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -428,7 +498,7 @@ function OwnerDashboard({ user, onLogout }) {
                   <table className="dashboard-table">
                     <thead>
                       <tr>
-                        <th>Title</th><th>Date</th><th>Start</th><th>End</th>
+                        <th>Title</th><th>Date</th><th>Start</th><th>End</th><th>Location</th>
                         <th>Status</th><th>Booked By</th><th>Actions</th>
                       </tr>
                     </thead>
@@ -439,6 +509,7 @@ function OwnerDashboard({ user, onLogout }) {
                           <td>{slot.slot_date}</td>
                           <td>{slot.start_time}</td>
                           <td>{slot.end_time}</td>
+                          <td>{slot.location || "Not specified"}</td>
                           <td>{slot.is_active ? "Active" : "Private"}</td>
                           <td>{slot.booked_by ?? "Not booked"}</td>
                           <td>
@@ -448,7 +519,9 @@ function OwnerDashboard({ user, onLogout }) {
                             {slot.booked_by && (
                               <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                             )}
-                            <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                            {!slot.booked_by && (
+                              <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -466,7 +539,7 @@ function OwnerDashboard({ user, onLogout }) {
                   <table className="dashboard-table">
                     <thead>
                       <tr>
-                        <th>Title</th><th>Date</th><th>Start</th><th>End</th>
+                        <th>Title</th><th>Date</th><th>Start</th><th>End</th><th>Location</th>
                         <th>Status</th><th>Booked By</th><th>Actions</th>
                       </tr>
                     </thead>
@@ -477,6 +550,7 @@ function OwnerDashboard({ user, onLogout }) {
                           <td>{slot.slot_date}</td>
                           <td>{slot.start_time}</td>
                           <td>{slot.end_time}</td>
+                          <td>{slot.location || "Not specified"}</td>
                           <td>{slot.is_active ? "Active" : "Private"}</td>
                           <td>{slot.booked_by ?? "Not booked"}</td>
                           <td>
@@ -486,7 +560,9 @@ function OwnerDashboard({ user, onLogout }) {
                             {slot.booked_by && (
                               <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                             )}
-                            <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                            {!slot.booked_by && (
+                              <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -506,7 +582,7 @@ function OwnerDashboard({ user, onLogout }) {
                   <table className="dashboard-table">
                     <thead>
                       <tr>
-                        <th>Title</th><th>Date</th><th>Start</th><th>End</th>
+                        <th>Title</th><th>Date</th><th>Start</th><th>End</th><th>Location</th>
                         <th>Status</th><th>Booked By</th><th>Actions</th>
                       </tr>
                     </thead>
@@ -517,6 +593,7 @@ function OwnerDashboard({ user, onLogout }) {
                           <td>{slot.slot_date}</td>
                           <td>{slot.start_time}</td>
                           <td>{slot.end_time}</td>
+                          <td>{slot.location || "Not specified"}</td>
                           <td>{slot.is_active ? "Active" : "Private"}</td>
                           <td>{slot.booked_by ?? "Not booked"}</td>
                           <td>
@@ -526,7 +603,9 @@ function OwnerDashboard({ user, onLogout }) {
                             {slot.booked_by && (
                               <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                             )}
-                            <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                            {!slot.booked_by && (
+                              <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -610,6 +689,11 @@ function OwnerDashboard({ user, onLogout }) {
                   <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} />
                 </div>
 
+                <div className="form-group">
+                  <label>Location (optional)</label>
+                  <input type="text" value={slotLocation} onChange={e => setSlotLocation(e.target.value)} />
+                </div>
+
                 <button className="btn-primary btn-full" onClick={handleCreateSlot} disabled={slotLoading}>
                   {slotLoading ? 'Creating...' : 'Create Slot'}
                 </button>
@@ -655,10 +739,57 @@ function OwnerDashboard({ user, onLogout }) {
                   <input type="number" min="1" value={recurWeeks} onChange={e => setRecurWeeks(e.target.value)} />
                 </div>
 
+                <div className="form-group">
+                  <label>Location (optional)</label>
+                  <input type="text" value={recurLocation} onChange={e => setRecurLocation(e.target.value)} />
+                </div>
+
                 <button className="btn-primary btn-full" onClick={handleCreateRecurring} disabled={recurLoading}>
                   {recurLoading ? 'Creating...' : 'Create Recurring Slots'}
                 </button>
               </div>
+
+              <h3 style={{ marginTop: '24px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
+                Recurring Batches
+              </h3>
+
+              {recurringBatches.length === 0 ? (
+                <p>No recurring batches yet.</p>
+              ) : (
+                <table className="dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Weeks</th>
+                      <th>Location</th>
+                      <th>Slots</th>
+                      <th>Booked</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recurringBatches.map(batch => (
+                      <tr key={batch.id}>
+                        <td>{batch.title}</td>
+                        <td>{batch.weeks}</td>
+                        <td>{batch.location || "Not specified"}</td>
+                        <td>{batch.slot_count}</td>
+                        <td>{batch.booked_count}</td>
+                        <td>{batch.is_active ? "Active" : "Private"}</td>
+                        <td>
+                          <button onClick={() => handleToggleBatch(batch)}>
+                            {batch.is_active ? "Make Private" : "Make Active"}
+                          </button>
+                          <button onClick={() => handleDeleteBatch(batch)}>
+                            Delete Batch
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </section>
           </div>
         )}
@@ -690,6 +821,16 @@ function OwnerDashboard({ user, onLogout }) {
                     value={meetingDescription}
                     onChange={e => setMeetingDescription(e.target.value)}
                     rows={3}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Location (optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. McConnell 320"
+                    value={meetingLocation}
+                    onChange={e => setMeetingLocation(e.target.value)}
                   />
                 </div>
 
@@ -734,6 +875,7 @@ function OwnerDashboard({ user, onLogout }) {
                 {groupMeetings.map(meeting => (
                   <div key={meeting.id} className="owner-card">
                     <strong>{meeting.title}</strong>
+                    <span>{meeting.location || "Not specified"}</span>
                     <button className="btn-primary" onClick={() => handleViewVotes(meeting)}>
                       View Votes
                     </button>
@@ -749,6 +891,7 @@ function OwnerDashboard({ user, onLogout }) {
           <section className="appointments-view">
             <button onClick={() => { setView("group_meetings")}}>← Back</button>
             <h2>Votes for: {selectedMeeting.title}</h2>
+            <p>Location: {selectedMeeting.location || "Not specified"}</p>
 
             {finalizeMessage && <p className="form-message">{finalizeMessage}</p>}
 
@@ -780,6 +923,31 @@ function OwnerDashboard({ user, onLogout }) {
                           Finalize
                         </button>
                       </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            <h3 style={{ marginTop: '24px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
+              Final Attendees
+            </h3>
+
+            {groupAttendees.length === 0 ? (
+              <p>No finalized attendees yet.</p>
+            ) : (
+              <table className="dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {groupAttendees.map(attendee => (
+                    <tr key={attendee.email}>
+                      <td>{attendee.name}</td>
+                      <td>{attendee.email}</td>
                     </tr>
                   ))}
                 </tbody>
