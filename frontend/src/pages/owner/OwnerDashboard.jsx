@@ -84,13 +84,13 @@ function OwnerDashboard({ user, onLogout }) {
   }
 
   // ======================== Fetch group meetings
-  const fetchGroupMeetings = () => {
+  /*const fetchGroupMeetings = () => {
     apiGet('create_group_meeting.php')
       .then(data => {
         setGroupMeetings(data.meetings || [])
       })
       .catch(() => {})
-  }
+  }*/
 
   // ___________ COPY invite URL to Clipboard
   const handleCopyInvite = () => {
@@ -313,7 +313,7 @@ function OwnerDashboard({ user, onLogout }) {
       setFinalizeMessage(data.message)
 
       apiGet("owner_slots.php").then(d => setSlots(d.slots || []))
-      fetchGroupMeetings()
+      
     } catch (err) {
       setFinalizeMessage(err.message)
     }
@@ -356,7 +356,7 @@ function OwnerDashboard({ user, onLogout }) {
             Create Group Meeting
           </button>
 
-          <button className="appt-tab-btn" onClick={() => { setView("group_meetings"); fetchGroupMeetings() }}>
+          <button className="appt-tab-btn" onClick={() => { setView("group_meetings") }}>
             View Group Votes
           </button>
 
@@ -666,7 +666,7 @@ function OwnerDashboard({ user, onLogout }) {
         {/* **************_____________VOTE COUNTS + FINALIZE________________***************** */}
         {view === "view_votes" && selectedMeeting && (
           <section className="appointments-view">
-            <button onClick={() => { setView("group_meetings"); fetchGroupMeetings() }}>← Back</button>
+            <button onClick={() => { setView("group_meetings")}}>← Back</button>
             <h2>Votes for: {selectedMeeting.title}</h2>
 
             {finalizeMessage && <p className="form-message">{finalizeMessage}</p>}
