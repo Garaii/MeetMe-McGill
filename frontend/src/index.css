@@ -36,7 +36,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; color: var(--text); }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 2px 24px;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
 }
@@ -50,8 +50,8 @@ h1, h2, h3 { margin: 0; font-weight: 600; color: var(--text); }
 }
 
 .nav-logo svg {
-  display: block; 
-  height: 50px;   /* control size here */
+  display: block;
+  height: 90px;   /* control size here */
   width: auto;    /* to keep ratio */
 }
 
@@ -102,38 +102,38 @@ button:hover {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 80px 40px 60px;
+  padding: 70px 40px 40px;
   gap: 14px;
 }
 
 .app_description h1 {
-  font-size: 48px;
-  letter-spacing: -1px;
+  font-size: 44px;
+  letter-spacing: -0.8px;
+  font-weight: 600;
 }
 
 .app_description p {
-  color: var(--text-muted);
-  max-width: 480px;
-  font-size: 17px;
+  font-size: 18px;
+  color: #4b5563;
 }
 
 .landing_buttons {
   display: flex;
   gap: 10px;
-  margin-top: 8px;
+  margin-top: 16px;
 }
 
 .how-it-works {
-  padding: 60px 40px;
+  padding: 30px 40px;
   text-align: center;
   background: var(--bg-secondary);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #eee;
   border-bottom: 1px solid var(--border);
 }
 
 .how-it-works h2 {
-  font-size: 22px;
-  margin-bottom: 32px;
+  font-size: 24px;
+  margin-bottom: 30px;
 }
 
 .card-row {
@@ -147,30 +147,68 @@ button:hover {
   flex: 1;
   min-width: 200px;
   max-width: 260px;
-  padding: 24px;
+  padding: 28px;   /* slightly more breathing room */
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--bg);
-  text-align: left;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cards:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
+.card-icon {
+  display: flex;
+  justify-content: center;  /* centers icon horizontally */
+  margin-bottom: 16px;
+  color: var(--accent);
+}
+
+
+.card-icon svg {
+  width: 32px;
+  height: 32px;
+  stroke: currentColor;
+  stroke-width: 1.5;
 }
 
 .cards h3 {
   font-size: 15px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  text-align: center;
 }
 
+.adjust-title {
+  margin-top: 20px;   /* adjust this value */
+}
 .cards p {
   font-size: 14px;
   color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.search-icon svg {
+  width: 36px;
+  height: 36px;
+}
+
+.confirm-icon svg {
+  width: 35px;
+  height: 35px;
 }
 
 .footer {
   text-align: center;
-  padding: 20px;
+  padding: 25px;
   border-top: 1px solid var(--border);
   color: var(--text-muted);
   font-size: 13px;
   margin-top: auto;
+ 
 }
 
 /* Auth pages (Login / Register)  */
@@ -178,12 +216,14 @@ button:hover {
   flex: 1;
   min-width: 0;
 }
+
 .auth-page {
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: calc(100vh - 60px);
-  padding: 40px 20px;
+  align-items: flex-start;
+  padding: 40px 20px 40px;   /* less bottom space */
+  background: var(--bg-secondary);
+
 }
 
 .auth-card {
