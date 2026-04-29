@@ -346,7 +346,7 @@ button:hover {
 /* Dashboard tabs */
 .dashboard-tabs {
   display: flex;
-  gap: 8px;
+  gap: 9px;
   margin: 20px 0;
   flex-wrap: wrap;
 }
