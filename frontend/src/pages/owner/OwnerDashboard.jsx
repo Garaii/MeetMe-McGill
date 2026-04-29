@@ -458,10 +458,10 @@ function OwnerDashboard({ user, onLogout }) {
               )}
 
                 {/* __________________ request _________________ */}
-               {groupedSlots.request.length > 0 && (
+               {groupedSlots.requested.length > 0 && (
                 <>
                   <h3 style={{ marginTop: '24px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
-                    Request Meeting Slots
+                    Requested Meeting Slots
                   </h3>
                   <table className="dashboard-table">
                     <thead>
@@ -471,7 +471,7 @@ function OwnerDashboard({ user, onLogout }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {groupedSlots.request.map(slot => (
+                      {groupedSlots.requested.map(slot => (
                         <tr key={slot.id}>
                           <td>{slot.title}</td>
                           <td>{slot.slot_date}</td>
