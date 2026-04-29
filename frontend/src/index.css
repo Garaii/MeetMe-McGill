@@ -354,6 +354,7 @@ button:hover {
 .dashboard-tabs button {
   font-size: 13px;
   padding: 7px 14px;
+  gap: 9px;
 }
 
 .dashboard-tabs button.active,
