@@ -473,7 +473,7 @@ button:hover {
   display: flex;
   align-items: left;
   gap: 8px;
-  /*flex-wrap: wrap;*/
+  flex-wrap: wrap;
 }
 
 .meeting-option-row label {
