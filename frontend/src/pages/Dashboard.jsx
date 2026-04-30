@@ -168,7 +168,6 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
   const handleCancelBooking = async (booking) => {
     if (booking.can_cancel === 0 || booking.can_cancel === "0") return
 
-    // will have to update appearance of this
     if(!window.confirm("Cancel this booking?")) return
     try {
       const data = await apiPost("cancel_booking.php", { booking_id: booking.booking_id})
