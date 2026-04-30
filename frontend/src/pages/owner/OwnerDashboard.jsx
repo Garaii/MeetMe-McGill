@@ -474,17 +474,17 @@ function OwnerDashboard({ user, onLogout }) {
                         <td>{slot.is_active ? "Active" : "Private"}</td>
                         <td>{slot.booked_by ?? "Not booked"}</td>
                         <td>
+                          <div className='action-btn'>
                           <button className='activity-btn' onClick={() => handleToggleVisibility(slot.id, slot.is_active)}>
                             {slot.is_active ? "Make Private" : "Make Active"}
                           </button>
-
                           {slot.booked_by && (
                             <button className='email-btn' onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                           )}
-
                           <button className='delete-btn' onClick={() => handleDeleteSlot(slot)}>
                             Delete
                           </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -517,6 +517,7 @@ function OwnerDashboard({ user, onLogout }) {
                           <td>{slot.is_active ? "Active" : "Private"}</td>
                           <td>{slot.booked_by ?? "Not booked"}</td>
                           <td>
+                            <div className='action-btn'>
                             <button className='activity-btn' onClick={() => handleToggleVisibility(slot.id, slot.is_active)}>
                               {slot.is_active ? "Make Private" : "Make Active"}
                             </button>
@@ -524,6 +525,7 @@ function OwnerDashboard({ user, onLogout }) {
                               <button className='email-btn' onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                             )}
                             <button className='delete-btn' onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -556,6 +558,7 @@ function OwnerDashboard({ user, onLogout }) {
                           <td>{slot.is_active ? "Active" : "Private"}</td>
                           <td>{slot.booked_by ?? "Not booked"}</td>
                           <td>
+                            <div className='action-btn'>
                             <button className='activity-btn' onClick={() => handleToggleVisibility(slot.id, slot.is_active)}>
                               {slot.is_active ? "Make Private" : "Make Active"}
                             </button>
@@ -563,6 +566,7 @@ function OwnerDashboard({ user, onLogout }) {
                               <button className='email-btn' onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                             )}
                             <button className='delete-btn' onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -597,6 +601,7 @@ function OwnerDashboard({ user, onLogout }) {
                           <td>{slot.is_active ? "Active" : "Private"}</td>
                           <td>{slot.booked_by ?? "Not booked"}</td>
                           <td>
+                            <div className='action-btn'>
                             <button className='activity-btn' onClick={() => handleToggleVisibility(slot.id, slot.is_active)}>
                               {slot.is_active ? "Make Private" : "Make Active"}
                             </button>
@@ -604,6 +609,7 @@ function OwnerDashboard({ user, onLogout }) {
                               <button className='email-btn' onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                             )}
                             <button className='delete-btn' onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -651,8 +657,10 @@ function OwnerDashboard({ user, onLogout }) {
                       <td>{req.requested_start}</td>
                       <td>{req.requested_end}</td>
                       <td>
+                        <div className='action-btn'>
                         <button className='accept-btn' onClick={() => handleAcceptRequest(req.id)}>Accept</button>
                         <button className='delete-btn' onClick={() => handleDeclineRequest(req.id)}>Decline</button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -781,12 +789,14 @@ function OwnerDashboard({ user, onLogout }) {
                             <td>{batch.booked_count}</td>
                             <td>{batch.is_active ? "Active" : "Private"}</td>
                             <td>
+                              <div className='action-btn'>
                               <button className='activity-btn' onClick={() => handleToggleBatch(batch)}>
                                 {batch.is_active ? "Make Private" : "Make Active"}
                               </button>
                               <button className="delete-btn" onClick={() => handleDeleteBatch(batch)}>
                                 Delete Batch
                               </button>
+                              </div>
                             </td>
                           </tr>
                         ))}

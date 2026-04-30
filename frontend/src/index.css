@@ -81,6 +81,13 @@ button {
   color: #474747;
 }
 
+.action-btns {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+}
+
 .delete-btn{
   background: #b30000;
   border-color: #b30000;
