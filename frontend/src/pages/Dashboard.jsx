@@ -168,6 +168,7 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
   const handleCancelBooking = async (booking) => {
     if (booking.can_cancel === 0 || booking.can_cancel === "0") return
 
+    
     if(!window.confirm("Cancel this booking?")) return
     try {
       const data = await apiPost("cancel_booking.php", { booking_id: booking.booking_id})
@@ -266,7 +267,7 @@ const handleLoadGroupMeeting = async () => {
     }
  
     setGroupLoading(true)
-    try { //WILL HAVE TO UPDATE
+    try { 
       const data = await apiPost("submit_group_availability.php", {
         group_meeting_id: groupMeetingId,
         selected_options: selectedOptions
