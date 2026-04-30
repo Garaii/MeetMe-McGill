@@ -75,17 +75,7 @@ button {
   transition: background 0.15s, border-color 0.15s;
 }
 
-.activity-btn{
-  background: #dfc6ef;
-  border-color: #cea9d3;
-  color: #474747;
-}
-
-.dashboard-table td:last-child {
-  white-space: nowrap;
-}
-
-.dashboard-table td:last-child {
+.action-btns {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
