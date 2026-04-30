@@ -1,7 +1,14 @@
-/* ********************************************************************************************************* */
+/* CONTRIBUTORS AND TASK COORDINATION
+IKRAM
+
+IKRAM: CREATED THE OWNER DASHBOARD PAGE WITH ALL NECESSARY ACTIONS REQUIRED TO THE USER,
+ FOLLOWING A VIEW PORT LAYOUT TO PREVENT GOING FROM PAGES AND BACK 
+ ORDERING THE OWNER APPOINTMENTS TABS FOR EVERY ACTION AND OPTIMIZING FLOW
+ 
+*/ 
 // OwnerDashboard.jsx
 import { useState, useEffect } from 'react'
-import Navbar from '../../components/Navbar'
+import Navbar from '../components/Navbar'
 import {apiGet, apiPost} from '../../api'
 
 function OwnerDashboard({ user, onLogout }) {

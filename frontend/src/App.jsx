@@ -5,10 +5,10 @@ import LandingPage from './pages/Landing'
 import LoginPage from './pages/Login'
 import DashboardPage from './pages/Dashboard'
 import RegisterPage from './pages/Register'
-import BookPage from './pages/BookPage'
-import CreateSlotPage from './pages/owner/CreateSlot'
+
+
 import OwnerDashboard from './pages/owner/OwnerDashboard'
-import SlotDetail from './pages/owner/SlotDetail'
+
 
 import { apiGet, apiPost } from './api'
 
@@ -116,23 +116,16 @@ function App() {
           <DashboardPage
             user={user}
             onLogout={handleLogout}
-            onBook={() => setPage("book")}
+           
           />
         )}
 
-        {page === "book" && user && (
-          <BookPage
-            user={user}
-            onBack={() => setPage("dashboard")}
-          />
-        )}
+      
 
         {page === "ownerDashboard" && user && (
           <OwnerDashboard
             user={user}
             onLogout={handleLogout}
-            onCreateSlot={() => setPage("createSlot")}
-            onViewSlot={() => setPage("slotDetail")}
           />
         )}
 
