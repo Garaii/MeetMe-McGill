@@ -403,10 +403,10 @@ button:hover, .email-btn:hover {
 /* Dashboard tabs */
 .dashboard-tabs {
   display: flex;
-  gap: 10px;
+  gap: 16px;
   margin: 20px 0;
-  flex-wrap: wrap;
-  justify-content: flex-start;
+  flex-wrap: nowrap;
+  justify-content: center;
   align-items: center;
   position: static;
   transform: none;
@@ -429,6 +429,7 @@ button:hover, .email-btn:hover {
   padding: 8px 14px;
   border-radius: 8px;
   font-size: 14px;
+  white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s ease;
 }

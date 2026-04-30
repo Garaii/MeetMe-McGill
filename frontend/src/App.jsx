@@ -33,12 +33,7 @@ function App() {
         if (result.logged_in && result.user) {
           setUser(result.user)
 
-          const params = new URLSearchParams(window.location.search)
-          const ownerId = params.get("owner_id")
-
-          if (ownerId) {
-            setPage("dashboard")
-          } else if (result.user.role === "owner") {
+          if (result.user.role === "owner") {
             setPage("ownerDashboard")
           } else {
             setPage("dashboard")
@@ -59,13 +54,8 @@ function App() {
   function handleLogin(userData) {
     setUser(userData)
 
-    const params = new URLSearchParams(window.location.search)
-    const ownerId = params.get("owner_id")
-
     // redirect based on role after login
-    if (ownerId) {
-      setPage("dashboard")
-    } else if (userData.role === "owner") {
+    if (userData.role === "owner") {
       setPage("ownerDashboard")
     } else {
       setPage("dashboard")
@@ -133,6 +123,7 @@ function App() {
           <OwnerDashboard
             user={user}
             onLogout={handleLogout}
+            initialBookingOwnerId={new URLSearchParams(window.location.search).get("owner_id")}
           />
         )}
 

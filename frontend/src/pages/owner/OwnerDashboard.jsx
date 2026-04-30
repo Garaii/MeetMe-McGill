@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react'
 import Navbar from '../../components/Navbar'
 import {apiGet, apiPost} from '../../api'
 
-function OwnerDashboard({ user, onLogout }) {
+function OwnerDashboard({ user, onLogout, initialBookingOwnerId }) {
   const [view, setView] = useState("slots")
 
   // Slots state
@@ -67,6 +67,26 @@ function OwnerDashboard({ user, onLogout }) {
   const [recurSuccess, setRecurSuccess] = useState('')
   const [recurLoading, setRecurLoading] = useState(false)
 
+  // Book with other owners
+  const [bookOwners, setBookOwners] = useState([])
+  const [bookOwnersLoading, setBookOwnersLoading] = useState(false)
+  const [bookOwnersLoaded, setBookOwnersLoaded] = useState(false)
+  const [selectedBookOwner, setSelectedBookOwner] = useState(null)
+  const [bookOwnerSlots, setBookOwnerSlots] = useState([])
+  const [bookOwnerSlotsLoading, setBookOwnerSlotsLoading] = useState(false)
+  const [bookOtherMessage, setBookOtherMessage] = useState('')
+  const [bookOtherError, setBookOtherError] = useState(false)
+
+  // Request meeting with another owner
+  const [otherOwnerId, setOtherOwnerId] = useState('')
+  const [otherRequestDate, setOtherRequestDate] = useState('')
+  const [otherRequestStart, setOtherRequestStart] = useState('')
+  const [otherRequestEnd, setOtherRequestEnd] = useState('')
+  const [otherRequestMessage, setOtherRequestMessage] = useState('')
+  const [otherRequestError, setOtherRequestError] = useState('')
+  const [otherRequestSuccess, setOtherRequestSuccess] = useState('')
+  const [otherRequestLoading, setOtherRequestLoading] = useState(false)
+
   // ======================= Fetch slots from php on mount
   useEffect(() => {
     apiGet('owner_slots.php')
@@ -108,6 +128,21 @@ function OwnerDashboard({ user, onLogout }) {
         setRecurringBatches(data.batches || [])
       })
       .catch(() => {})
+  }
+
+  // ======================== Fetch owners for booking/requesting
+  const fetchBookOwners = () => {
+    if (bookOwnersLoaded) return
+
+    setBookOwnersLoading(true)
+
+    apiGet("owners_list.php")
+      .then(data => {
+        setBookOwners(data.owners || [])
+        setBookOwnersLoaded(true)
+        setBookOwnersLoading(false)
+      })
+      .catch(() => setBookOwnersLoading(false))
   }
 
   // ___________ COPY invite URL to Clipboard
@@ -287,6 +322,96 @@ function OwnerDashboard({ user, onLogout }) {
     }
   }
 
+  // ____________________________ select owner to book with
+  const handleSelectBookOwner = (owner) => {
+    setSelectedBookOwner(owner)
+    setBookOwnerSlots([])
+    setBookOtherMessage('')
+    setBookOtherError(false)
+    setBookOwnerSlotsLoading(true)
+    setView("book_with_others")
+
+    apiGet(`owner_booking_page.php?owner_id=${owner.id}`)
+      .then(data => {
+        setSelectedBookOwner(data.owner)
+        setBookOwnerSlots(data.slots || [])
+        setBookOwnerSlotsLoading(false)
+      })
+      .catch(err => {
+        setBookOtherMessage(err.message)
+        setBookOtherError(true)
+        setBookOwnerSlotsLoading(false)
+      })
+  }
+
+  // ____________________________ book another owner's slot
+  const handleBookOtherSlot = async (slot) => {
+    setBookOtherMessage('')
+    setBookOtherError(false)
+
+    try {
+      const data = await apiPost("book_slot.php", { slot_id: slot.id })
+      setBookOtherMessage(data.message || "Slot booked successfully.")
+      setBookOtherError(false)
+
+      if (selectedBookOwner) {
+        apiGet(`owner_booking_page.php?owner_id=${selectedBookOwner.id}`)
+          .then(d => setBookOwnerSlots(d.slots || []))
+          .catch(() => {})
+      }
+    } catch (err) {
+      setBookOtherMessage(err.message)
+      setBookOtherError(true)
+    }
+  }
+
+  // ____________________________ send meeting request to another owner
+  const handleSendOtherRequest = async () => {
+    setOtherRequestError('')
+    setOtherRequestSuccess('')
+
+    if (!otherOwnerId || !otherRequestDate || !otherRequestStart || !otherRequestEnd || otherRequestMessage.trim() === '') {
+      setOtherRequestError("Please select an owner, suggest a time, and write a message.")
+      return
+    }
+
+    if (otherRequestEnd <= otherRequestStart) {
+      setOtherRequestError("End time must be later than start time.")
+      return
+    }
+
+    setOtherRequestLoading(true)
+
+    try {
+      const data = await apiPost("request_meeting.php", {
+        owner_id: otherOwnerId,
+        requested_date: otherRequestDate,
+        start_time: otherRequestStart,
+        end_time: otherRequestEnd,
+        message: otherRequestMessage
+      })
+
+      setOtherRequestSuccess(data.message || "Meeting request sent successfully.")
+      setOtherOwnerId('')
+      setOtherRequestDate('')
+      setOtherRequestStart('')
+      setOtherRequestEnd('')
+      setOtherRequestMessage('')
+    } catch (err) {
+      setOtherRequestError(err.message)
+    } finally {
+      setOtherRequestLoading(false)
+    }
+  }
+
+  // ____________________________ load booking link inside owner dashboard
+  useEffect(() => {
+    if (!initialBookingOwnerId) return
+
+    fetchBookOwners()
+    handleSelectBookOwner({ id: initialBookingOwnerId, name: "selected owner" })
+  }, [initialBookingOwnerId])
+
   // __________________ Group meeting option helpers transforming to php -> json -> react
   const updateMeetingOption = (index, field, value) => {
     setMeetingOptions(prev =>
@@ -419,6 +544,10 @@ function OwnerDashboard({ user, onLogout }) {
         <div className="dashboard-tabs">
           <button className="appt-tab-btn" onClick={() => setView("slots")}>
             My Slots
+          </button>
+
+          <button className="appt-tab-btn" onClick={() => { setView("book_with_others"); fetchBookOwners() }}>
+            Book With Others
           </button>
 
           <button className="appt-tab-btn" onClick={() => { setView("requests"); fetchRequests() }}>
@@ -622,8 +751,143 @@ function OwnerDashboard({ user, onLogout }) {
               )}
             </>
           )}
-        </section>
-      )}
+          </section>
+        )}
+
+        {/* ── BOOK WITH OTHERS ── */}
+        {view === "book_with_others" && (
+          <section className="browse-view">
+            <h2>Book With Others</h2>
+
+            <h3 style={{ marginTop: '8px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
+              Browse Owners
+            </h3>
+
+            {bookOwnersLoading && <p>Loading owners...</p>}
+
+            {!bookOwnersLoading && bookOwners.length === 0 && (
+              <p>No other owners found.</p>
+            )}
+
+            {!bookOwnersLoading && bookOwners.length > 0 && (
+              <div className="owners-list">
+                {bookOwners.map(owner => (
+                  <div key={owner.id} className="owner-card">
+                    <div>
+                      <strong>{owner.name}</strong>
+                      <span>{owner.email}</span>
+                    </div>
+                    <button className="btn-primary" onClick={() => handleSelectBookOwner(owner)}>
+                      View Slots
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {bookOtherMessage && (
+              <p className={bookOtherError ? "auth-error" : "form-message"}>{bookOtherMessage}</p>
+            )}
+
+            {selectedBookOwner && (
+              <div style={{ marginTop: '18px' }}>
+                <button onClick={() => { setSelectedBookOwner(null); setBookOwnerSlots([]); setBookOtherMessage('') }}>
+                  ← Back to owners
+                </button>
+                <h3 style={{ marginTop: '14px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
+                  Available slots with {selectedBookOwner.name}
+                </h3>
+
+                {bookOwnerSlotsLoading && <p>Loading slots...</p>}
+
+                {!bookOwnerSlotsLoading && bookOwnerSlots.length === 0 && (
+                  <p>No available slots for this person.</p>
+                )}
+
+                {!bookOwnerSlotsLoading && bookOwnerSlots.length > 0 && (
+                  <table className="dashboard-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Location</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bookOwnerSlots.map(slot => (
+                        <tr key={slot.id}>
+                          <td>{slot.slot_date}</td>
+                          <td>{slot.start_time}</td>
+                          <td>{slot.end_time}</td>
+                          <td>{slot.location || "Not specified"}</td>
+                          <td>
+                            <button className="btn-primary" onClick={() => handleBookOtherSlot(slot)}>
+                              Book
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
+
+            <h3 style={{ marginTop: '28px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
+              Request Meeting
+            </h3>
+
+            {otherRequestError && <p className="auth-error">{otherRequestError}</p>}
+            {otherRequestSuccess && <p className="auth-success">{otherRequestSuccess}</p>}
+
+            <div className="auth-form">
+              <div className="form-group">
+                <label>Select Owner</label>
+                <select value={otherOwnerId} onChange={e => setOtherOwnerId(e.target.value)}>
+                  <option value="">-- Choose an owner --</option>
+                  {bookOwners.map(owner => (
+                    <option key={owner.id} value={owner.id}>
+                      {owner.name} ({owner.email})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Suggested Date</label>
+                <input type="date" value={otherRequestDate} onChange={e => setOtherRequestDate(e.target.value)} />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Start Time</label>
+                  <input type="time" value={otherRequestStart} onChange={e => setOtherRequestStart(e.target.value)} />
+                </div>
+
+                <div className="form-group">
+                  <label>End Time</label>
+                  <input type="time" value={otherRequestEnd} onChange={e => setOtherRequestEnd(e.target.value)} />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Message</label>
+                <textarea
+                  placeholder="Describe why you'd like to meet..."
+                  value={otherRequestMessage}
+                  onChange={e => setOtherRequestMessage(e.target.value)}
+                  rows={4}
+                />
+              </div>
+
+              <button className="btn-primary btn-full" onClick={handleSendOtherRequest} disabled={otherRequestLoading}>
+                {otherRequestLoading ? "Sending..." : "Send Request"}
+              </button>
+            </div>
+          </section>
+        )}
 
         {/* ── MEETING REQUESTS ── */}
         {view === "requests" && (
