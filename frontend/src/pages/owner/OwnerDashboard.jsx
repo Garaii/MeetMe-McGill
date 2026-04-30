@@ -659,7 +659,7 @@ function OwnerDashboard({ user, onLogout }) {
         {/* ── CREATE SLOT ── */}
         {view === "create_slot" && (
           <div className="auth-page">
-            <section className="auth-card">
+            <section className="auth-card recurring-card">
               <h2>Create a Slot</h2>
 
               {slotError && <p className="auth-error">{slotError}</p>}
@@ -741,47 +741,49 @@ function OwnerDashboard({ user, onLogout }) {
                 </button>
               </div>
 
-              <h3 style={{ marginTop: '24px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
-                Recurring Batches
-              </h3>
+              <div className="recurring-batches">
+                <h3>
+                  Recurring Batches
+                </h3>
 
-              {recurringBatches.length === 0 ? (
-                <p>No recurring batches yet.</p>
-              ) : (
-                <table className="dashboard-table">
-                  <thead>
-                    <tr>
-                      <th>Title</th>
-                      <th>Weeks</th>
-                      <th>Location</th>
-                      <th>Slots</th>
-                      <th>Booked</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recurringBatches.map(batch => (
-                      <tr key={batch.id}>
-                        <td>{batch.title}</td>
-                        <td>{batch.weeks}</td>
-                        <td>{batch.location || "Not specified"}</td>
-                        <td>{batch.slot_count}</td>
-                        <td>{batch.booked_count}</td>
-                        <td>{batch.is_active ? "Active" : "Private"}</td>
-                        <td>
-                          <button onClick={() => handleToggleBatch(batch)}>
-                            {batch.is_active ? "Make Private" : "Make Active"}
-                          </button>
-                          <button onClick={() => handleDeleteBatch(batch)}>
-                            Delete Batch
-                          </button>
-                        </td>
+                {recurringBatches.length === 0 ? (
+                  <p>No recurring batches yet.</p>
+                ) : (
+                  <table className="dashboard-table">
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Weeks</th>
+                        <th>Location</th>
+                        <th>Slots</th>
+                        <th>Booked</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+                    </thead>
+                    <tbody>
+                      {recurringBatches.map(batch => (
+                        <tr key={batch.id}>
+                          <td>{batch.title}</td>
+                          <td>{batch.weeks}</td>
+                          <td>{batch.location || "Not specified"}</td>
+                          <td>{batch.slot_count}</td>
+                          <td>{batch.booked_count}</td>
+                          <td>{batch.is_active ? "Active" : "Private"}</td>
+                          <td>
+                            <button onClick={() => handleToggleBatch(batch)}>
+                              {batch.is_active ? "Make Private" : "Make Active"}
+                            </button>
+                            <button onClick={() => handleDeleteBatch(batch)}>
+                              Delete Batch
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             </section>
           </div>
         )}
