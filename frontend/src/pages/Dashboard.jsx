@@ -1,3 +1,11 @@
+/* CONTRIBUTORS AND TASK COORDINATION
+IKRAM & SARAH
+
+IKRAM: lay out of the student dashboard dividing the different actions for a smoother flow 
+SARAH: made dashboard more accessible and improved the UX
+ 
+*/
+
 import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import {apiGet, apiPost} from '../api'

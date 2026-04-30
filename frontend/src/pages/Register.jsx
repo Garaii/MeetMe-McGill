@@ -1,4 +1,11 @@
-// Register.jsx
+/* CONTRIBUTORS AND TASK COORDINATION
+IKRAM
+
+IKRAM: created the REGISTER page made sure it is functional and connected to php fields
+      WITH DESIGN THAT IS EASY TO USE AND FOLLOWING COMPONENT LIBRARY
+
+ 
+*/
 import { useState } from 'react'
 import Navbar from '../components/Navbar'
 import { apiPost } from '../api'
