@@ -8,11 +8,11 @@ dist/
 frontend/dist/
 meetme-final/frontend/dist/
 
-# # local database files
-# *.sqlite
-# *.sqlite3
-# data/*.sqlite
-# api/*.sqlite
+# local database files
+*.sqlite
+*.sqlite3
+data/*.sqlite
+api/*.sqlite
 
 # system files
 .DS_Store
@@ -22,4 +22,3 @@ meetme-final/frontend/dist/
 .env
 .env.local
 backups/meetme-before-final-migrations.sqlite
-api/meetme.sqlite
