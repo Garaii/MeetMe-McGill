@@ -471,9 +471,9 @@ button:hover {
 /* Meeting option rows (create group meeting) */
 .meeting-option-row {
   display: flex;
-  align-items: center;
+  align-items: left;
   gap: 8px;
-  flex-wrap: wrap;
+  /*flex-wrap: wrap;*/
 }
 
 .meeting-option-row label {
