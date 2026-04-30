@@ -67,6 +67,35 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
 
   },[])
 
+  /* ===================== load owner slots if link has owner_id ====================== */
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const ownerId = params.get("owner_id")
+
+    if (!ownerId) return
+
+    setSelectedOwner(null)
+    setOwnerSlots([])
+    setBookMessage("")
+    setBookError(false)
+    setOwnerSlotsLoading(true)
+    setView("book")
+
+    apiGet(`owner_booking_page.php?owner_id=${ownerId}`)
+      .then(data => {
+        setSelectedOwner(data.owner)
+        setOwnerSlots(data.slots || [])
+        setOwnerSlotsLoading(false)
+      })
+      .catch(err => {
+        setSelectedOwner({ name: "selected owner" })
+        setOwnerSlots([])
+        setBookMessage(err.message)
+        setBookError(true)
+        setOwnerSlotsLoading(false)
+      })
+  }, [])
+
   /* ======================== FETCH OWNERS LIST (BUT LOADED LAZY SO CHANGE IT)====================== */
   const fetchOwners = () => {
     if (ownersLoaded) return

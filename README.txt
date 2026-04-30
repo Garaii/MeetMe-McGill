@@ -1,5 +1,12 @@
 MeetMe@McGill README
 
+To test:
+Test student: test.student@mail.mcgill.ca
+Password: 12345678
+
+Test prof: test.prof@mcgill.ca
+Password: 12345678
+
 AI usage + 30% outsourced work:
 - Error codes and error messages: figuring out what each error code number meant and what kind of message users should expect
 - Adapted some lines of code from in-class code demos

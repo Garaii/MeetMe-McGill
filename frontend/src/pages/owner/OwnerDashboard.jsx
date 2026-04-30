@@ -78,11 +78,7 @@ function OwnerDashboard({ user, onLogout }) {
 
     // creating URL using current user's ID
     // Links to owner's booking page
-    const base = window.location.hostname === "localhost"
-      ? "http://localhost:5173"
-      : window.location.origin
-
-    setInviteUrl(`${base}/book/${user.id}`)
+    setInviteUrl(`${window.location.origin}/?owner_id=${user.id}`)
   }, [])
 
   // ======================== Fetch requests only when tab opened
