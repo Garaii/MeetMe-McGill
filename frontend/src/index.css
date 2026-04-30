@@ -75,6 +75,26 @@ button {
   transition: background 0.15s, border-color 0.15s;
 }
 
+.cancel-btn{
+  background: #b30000;
+  border-color: #b30000;
+}
+
+.delete-btn{
+  background: #b30000;
+  border-color: #b30000;
+}
+
+.accept-btn{
+  background: #a4fc84;
+  border-color: #7cc378;
+}
+
+.email-btn{
+  background: #a4e3f2;
+  border-color: #92baed;
+}
+
 button:hover {
   background: var(--bg-secondary);
   border-color: #d1d5db;

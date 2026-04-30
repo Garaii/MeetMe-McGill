@@ -479,10 +479,10 @@ function OwnerDashboard({ user, onLogout }) {
                           </button>
 
                           {slot.booked_by && (
-                            <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
+                            <button className='email-btn' onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                           )}
 
-                          <button onClick={() => handleDeleteSlot(slot)}>
+                          <button className='delete-btn' onClick={() => handleDeleteSlot(slot)}>
                             Delete
                           </button>
                         </td>
@@ -521,9 +521,9 @@ function OwnerDashboard({ user, onLogout }) {
                               {slot.is_active ? "Make Private" : "Make Active"}
                             </button>
                             {slot.booked_by && (
-                              <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
+                              <button className='email-btn' onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                             )}
-                            <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                            <button className='delete-btn' onClick={() => handleDeleteSlot(slot)}>Delete</button>
                           </td>
                         </tr>
                       ))}
@@ -562,7 +562,7 @@ function OwnerDashboard({ user, onLogout }) {
                             {slot.booked_by && (
                               <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                             )}
-                            <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                            <button className='delete-btn' onClick={() => handleDeleteSlot(slot)}>Delete</button>
                           </td>
                         </tr>
                       ))}
@@ -601,9 +601,9 @@ function OwnerDashboard({ user, onLogout }) {
                               {slot.is_active ? "Make Private" : "Make Active"}
                             </button>
                             {slot.booked_by && (
-                              <button onClick={() => handleEmailBookedUser(slot)}>Email User</button>
+                              <button className='email-btn' onClick={() => handleEmailBookedUser(slot)}>Email User</button>
                             )}
-                            <button onClick={() => handleDeleteSlot(slot)}>Delete</button>
+                            <button className='delete-btn' onClick={() => handleDeleteSlot(slot)}>Delete</button>
                           </td>
                         </tr>
                       ))}
@@ -651,8 +651,8 @@ function OwnerDashboard({ user, onLogout }) {
                       <td>{req.requested_start}</td>
                       <td>{req.requested_end}</td>
                       <td>
-                        <button onClick={() => handleAcceptRequest(req.id)}>Accept</button>
-                        <button onClick={() => handleDeclineRequest(req.id)}>Decline</button>
+                        <button className='accept-btn' onClick={() => handleAcceptRequest(req.id)}>Accept</button>
+                        <button className='delete-btn' onClick={() => handleDeclineRequest(req.id)}>Decline</button>
                       </td>
                     </tr>
                   ))}
@@ -784,7 +784,7 @@ function OwnerDashboard({ user, onLogout }) {
                               <button onClick={() => handleToggleBatch(batch)}>
                                 {batch.is_active ? "Make Private" : "Make Active"}
                               </button>
-                              <button onClick={() => handleDeleteBatch(batch)}>
+                              <button className="delete-btn" onClick={() => handleDeleteBatch(batch)}>
                                 Delete Batch
                               </button>
                             </td>
