@@ -78,13 +78,17 @@ button {
 .activity-btn{
   background: #dfc6ef;
   border-color: #cea9d3;
-  color: #474747
+  color: #474747;
 }
 
 .delete-btn{
   background: #b30000;
   border-color: #b30000;
   color: #fff
+}
+
+.delete-btn:hover{
+  color: #474747;
 }
 
 .accept-btn{
