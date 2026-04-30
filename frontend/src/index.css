@@ -380,9 +380,9 @@ button:hover {
   padding: 8px 10px;
   white-space: nowrap;
   line-height: 1;
-  background: transparent;
-  border-color: transparent;
-  border-radius: 0;
+  background: #f3f4f6;        /* light grey */
+  border: 1px solid #e5e7eb;  
+  border-radius: 6px; 
   color: var(--text);
   font-weight: 500;
 }
