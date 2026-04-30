@@ -81,7 +81,11 @@ button {
   color: #474747;
 }
 
-.action-btns {
+.dashboard-table td:last-child {
+  white-space: nowrap;
+}
+
+.dashboard-table td:last-child {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
