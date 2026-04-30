@@ -1,3 +1,10 @@
+/*
+CONTRIBUTORS AND TASK COORDINATION
+IKRAM 
+
+IKRAM: basic app routing for the different pages
+
+*/
 import { useState, useEffect } from "react"
 import './App.css'
 
