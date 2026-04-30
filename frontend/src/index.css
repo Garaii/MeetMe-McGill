@@ -112,17 +112,12 @@ button {
 }
 
 .email-btn{
-  background: #94dbec;
-  border-color: #b4e6f2;
-  color: #fff;
+  background: #b4e6f2;
+  border-color: #94dbec;
+  color: #25383c;
 }
 
-.email-btn:hover{
-  background: #46caeb;
-  border-color: #b4e6f2;
-}
-
-button:hover {
+button:hover, .email-btn:hover {
   background: var(--bg-secondary);
   border-color: #d1d5db;
 }
