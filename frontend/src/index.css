@@ -513,6 +513,10 @@ button:hover {
   margin-right: 6px;
 }
 
+.title-meet{
+  padding-bottom: 19px ;
+}
+
 /*  Owners list (browse view)  */
 .owners-list {
   display: flex;

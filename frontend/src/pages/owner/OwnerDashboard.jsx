@@ -820,7 +820,7 @@ function OwnerDashboard({ user, onLogout }) {
         {view === "create_group" && (
           <div className='auth-page'>
             <section className="auth-card">
-              <h2>Create Group Meeting</h2>
+              <h2 className='title-meet'>Create Group Meeting</h2>
 
               {meetingError && <p className="auth-error">{meetingError}</p>}
               {meetingSuccess && <p className="auth-success">{meetingSuccess}</p>}
