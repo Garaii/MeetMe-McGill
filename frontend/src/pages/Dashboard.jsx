@@ -5,6 +5,7 @@ import {apiGet, apiPost} from '../api'
 // Dashboard.jsx
 function DashboardPage({user, onLogout /*, onBook*/}) {
   const [view, setView] = useState("appointments")
+  const [menuOpen, setMenuOpen] = useState(false)
   const [selectedOwner, setSelectedOwner] = useState(null)
 
    // My CURRENT bookings
@@ -59,6 +60,34 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
       })
 
   },[])
+
+  /* ===================== load owner slots if link has owner_id ====================== */
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const ownerId = params.get("owner_id")
+
+    if (!ownerId) return
+
+    setOwnerSlots([])
+    setBookMessage("")
+    setBookError(false)
+    setOwnerSlotsLoading(true)
+    setView("book")
+
+    apiGet(`owner_booking_page.php?owner_id=${ownerId}`)
+      .then(data => {
+        setSelectedOwner(data.owner)
+        setOwnerSlots(data.slots || [])
+        setOwnerSlotsLoading(false)
+      })
+      .catch(err => {
+        setSelectedOwner({ name: "selected owner" })
+        setOwnerSlots([])
+        setBookMessage(err.message)
+        setBookError(true)
+        setOwnerSlotsLoading(false)
+      })
+  }, [])
 
   /* ======================== FETCH OWNERS LIST (BUT LOADED LAZY SO CHANGE IT)====================== */
   const fetchOwners = () => {
@@ -279,26 +308,30 @@ const handleLoadGroupMeeting = async () => {
     
     {/* ................... TABS ..................*/}       
     
-    <div className="dashboard-tabs">
+    <button className="dashboard-menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+      ☰ Menu
+    </button>
+
+    <div className={`dashboard-tabs ${menuOpen ? "open" : ""}`}>
       <button 
         className="appt-tab-btn"
-        onClick={() => setView("appointments")}
+        onClick={() => { setView("appointments"); setMenuOpen(false) }}
       >
         My Appointments
       </button>
       <button 
         className="browse-tab-btn" 
-        onClick={() => {setView("browse"); fetchOwners()}}
+        onClick={() => {setView("browse"); fetchOwners(); setMenuOpen(false)}}
       >
         Browse Owners
       </button>
       <button 
         className='request-tab-btn'
-        onClick={() => { setView("request"); fetchRequestOwners() }}
+        onClick={() => { setView("request"); fetchRequestOwners(); setMenuOpen(false) }}
       >
         Request a Meeting
       </button>
-      <button className='submit-tab-btn' onClick={() => setView("group_vote")}>
+      <button className='submit-tab-btn' onClick={() => { setView("group_vote"); setMenuOpen(false) }}>
         Submit Availability
       </button>
     </div>

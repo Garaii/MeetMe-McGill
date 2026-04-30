@@ -5,6 +5,9 @@ require_once "auth.php";
 require_login();
 // only logged-in users can see the list of owners
 
+$user_id = current_user_id();
+// get current logged-in user's ID
+
 $owners = [];
 // array to store owners
 
@@ -19,10 +22,11 @@ $stmt = $db->prepare("
         email
     FROM users
     WHERE role = 'owner'
+      AND id != ?
     ORDER BY name
 ");
 
-$stmt->execute();
+$stmt->execute([$user_id]);
 // run query
 
 $owners = $stmt->fetchAll();

@@ -5,6 +5,9 @@ require_once "auth.php";
 require_login();
 // only logged-in users can access this page
 
+$user_id = current_user_id();
+// get current logged-in user's ID
+
 $error = "";
 
 $owner_id = $_GET["owner_id"] ?? "";
@@ -13,6 +16,16 @@ $owner_id = $_GET["owner_id"] ?? "";
 if ($owner_id === "") {
     // check if owner ID is missing
     $error = "Owner not found.";
+
+    send_json([
+        "success" => false,
+        "message" => $error
+    ], 400);
+}
+
+if ((int)$owner_id === (int)$user_id) {
+    // stop users from booking their own slots
+    $error = "You cannot book your own slots.";
 
     send_json([
         "success" => false,
@@ -62,6 +75,7 @@ $slot_stmt = $db->prepare("
     WHERE s.owner_id = ?
       AND s.is_active = 1
       AND b.id IS NULL
+      AND COALESCE(s.slot_type, '') != 'group'
     ORDER BY s.start_time
 ");
 

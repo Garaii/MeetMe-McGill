@@ -392,6 +392,10 @@ button:hover {
 }
 
 /* Dashboard tabs */
+.dashboard-menu-toggle {
+  display: none;
+}
+
 .dashboard-tabs {
   display: flex;
   gap: 16px;
@@ -439,6 +443,50 @@ button:hover {
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 5px;
+}
+
+@media (max-width: 760px) {
+  .dashboard {
+    padding: 24px 16px;
+  }
+
+  .dashboard-menu-toggle {
+    display: block;
+    margin: 14px auto 16px;
+    background: transparent;
+    border-color: transparent;
+    font-weight: 600;
+  }
+
+  .dashboard-tabs {
+    display: none;
+    position: static;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 18px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg);
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dashboard-tabs.open {
+    display: flex;
+  }
+
+  .dashboard-tabs button {
+    width: 100%;
+    text-align: center;
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
+
+  .invite-banner {
+    margin-top: 12px;
+  }
 }
 
 /*  Dashboard sections */
