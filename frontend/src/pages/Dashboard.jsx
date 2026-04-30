@@ -150,7 +150,6 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
     setBookMessage("")
     setBookError(false)
     try{
-      //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
       await apiPost("book_slot.php", {slot_id})
       setBookMessage("Slot booked sucessfully!")
       setBookError(false)
@@ -204,7 +203,6 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
     }
     setRequestLoading(true)
     try {
-      //WILL HAVE TO update endpoint name request_meeting.php
       await apiPost("request_meeting.php", {
         owner_id: requestOwnerId,
         message: requestMessage,
@@ -239,7 +237,7 @@ const handleLoadGroupMeeting = async () => {
       return
     }
  
-    try { // WILL HATE TO UPDATE
+    try {
       const data = await apiGet(`submit_group_availability.php?group_meeting_id=${groupMeetingId}`)
       setGroupMeeting(data.meeting)
       setGroupOptions(data.options || [])
@@ -311,9 +309,7 @@ const handleLoadGroupMeeting = async () => {
     *
     *
     */}
-    {/* INSTEAD OF HAVING DIFFERENT PAGES WILL HAVE TABLES INSIDE OF DASHBOARD*/}
-   
-    {/* ................... TABS ..................*/}      
+    {/* ................... TABS ..................*/}       
    
     <div className="dashboard-tabs">
       <button
@@ -361,7 +357,6 @@ const handleLoadGroupMeeting = async () => {
           <p>No appointments yet.</p>
         )}
 
-        {/* HERE TO DISPLAY BOOKINGS AS A TABLE, WILL HAVE TO STYLE */}
         {!bookingsLoading && bookings.length > 0 && (
           <>
             <h3 style={{ marginTop: '16px', marginBottom: '8px', fontSize: '15px', color: 'var(--text-muted)' }}>
