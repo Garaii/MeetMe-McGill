@@ -362,7 +362,9 @@ button:hover {
   display: flex;
   gap: 9px;
   margin: 20px 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
 }
 
 .dashboard-tabs button {
@@ -482,14 +484,28 @@ button:hover {
   font-weight: 500;
 }
 
-.recurring-card {
-  max-width: 760px;
+.recurring-page {
+  width: min(960px, calc(100vw - 80px));
+  max-width: none;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.recurring-batch-card {
+  max-width: none;
+  width: 100%;
   background: #fff;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .recurring-batches {
   margin-top: 28px;
   text-align: center;
+  max-width: 100%;
 }
 
 .recurring-batches h3 {
@@ -498,8 +514,29 @@ button:hover {
   color: var(--text-muted);
 }
 
+.recurring-batches h2 {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
 .recurring-batches .dashboard-table {
   margin: 0 auto;
+}
+
+.recurring-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: visible;
+  padding-bottom: 4px;
+}
+
+.recurring-table-wrap .dashboard-table {
+  width: 100%;
+}
+
+.recurring-table-wrap td,
+.recurring-table-wrap th {
+  white-space: nowrap;
 }
 
 .meeting-option-row input {

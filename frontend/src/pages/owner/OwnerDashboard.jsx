@@ -696,8 +696,8 @@ function OwnerDashboard({ user, onLogout }) {
 
         {/* **********************______________________RECCURING OFFICE HOURS _________________******************* */}
         {view === "recurring" && (
-          <div className="auth-page">
-            <section className="auth-card">
+          <div className="auth-page recurring-page">
+            <section className="auth-card recurring-batch-card">
               <h2>Recurring Office Hours</h2>
 
               <p className="auth-subtitle">Create the same slot every week for X weeks</p>
@@ -741,47 +741,52 @@ function OwnerDashboard({ user, onLogout }) {
                 </button>
               </div>
 
+            </section>
+
+            <section className="auth-card recurring-batch-card">
               <div className="recurring-batches">
-                <h3>
+                <h2>
                   Recurring Batches
-                </h3>
+                </h2>
 
                 {recurringBatches.length === 0 ? (
                   <p>No recurring batches yet.</p>
                 ) : (
-                  <table className="dashboard-table">
-                    <thead>
-                      <tr>
-                        <th>Title</th>
-                        <th>Weeks</th>
-                        <th>Location</th>
-                        <th>Slots</th>
-                        <th>Booked</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recurringBatches.map(batch => (
-                        <tr key={batch.id}>
-                          <td>{batch.title}</td>
-                          <td>{batch.weeks}</td>
-                          <td>{batch.location || "Not specified"}</td>
-                          <td>{batch.slot_count}</td>
-                          <td>{batch.booked_count}</td>
-                          <td>{batch.is_active ? "Active" : "Private"}</td>
-                          <td>
-                            <button onClick={() => handleToggleBatch(batch)}>
-                              {batch.is_active ? "Make Private" : "Make Active"}
-                            </button>
-                            <button onClick={() => handleDeleteBatch(batch)}>
-                              Delete Batch
-                            </button>
-                          </td>
+                  <div className="recurring-table-wrap">
+                    <table className="dashboard-table">
+                      <thead>
+                        <tr>
+                          <th>Title</th>
+                          <th>Weeks</th>
+                          <th>Location</th>
+                          <th>Slots</th>
+                          <th>Booked</th>
+                          <th>Status</th>
+                          <th>Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {recurringBatches.map(batch => (
+                          <tr key={batch.id}>
+                            <td>{batch.title}</td>
+                            <td>{batch.weeks}</td>
+                            <td>{batch.location || "Not specified"}</td>
+                            <td>{batch.slot_count}</td>
+                            <td>{batch.booked_count}</td>
+                            <td>{batch.is_active ? "Active" : "Private"}</td>
+                            <td>
+                              <button onClick={() => handleToggleBatch(batch)}>
+                                {batch.is_active ? "Make Private" : "Make Active"}
+                              </button>
+                              <button onClick={() => handleDeleteBatch(batch)}>
+                                Delete Batch
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
             </section>

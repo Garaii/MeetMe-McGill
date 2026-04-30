@@ -216,7 +216,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "Saturday" => 6,
             "Sunday" => 7
         ];
-        // map weekday names to ISO weekday numbers
+        // map weekday names to weekday numbers
 
         if (!isset($weekday_map[$weekday])) {
             $error = "Invalid weekday selected.";
