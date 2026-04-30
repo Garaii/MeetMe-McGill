@@ -12,7 +12,7 @@ IKRAM: CREATED THE NAVBAR UI THAT CORRESPOND TO EVRY PAGE IT IS CALLED ON;
 function Navbar({ user, onLogin, onRegister, onLogout }) {
   return (
     <nav className="navbar">
-      
+     
       <div className="nav-logo">
         <svg
           width="180"

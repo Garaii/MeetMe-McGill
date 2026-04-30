@@ -5,7 +5,6 @@ IKRAM: lay out of the student dashboard dividing the different actions for a smo
 SARAH: made dashboard more accessible and improved the UX
  
 */
-
 import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import {apiGet, apiPost} from '../api'
@@ -13,7 +12,6 @@ import {apiGet, apiPost} from '../api'
 // Dashboard.jsx
 function DashboardPage({user, onLogout /*, onBook*/}) {
   const [view, setView] = useState("appointments")
-  const [menuOpen, setMenuOpen] = useState(false)
   const [selectedOwner, setSelectedOwner] = useState(null)
 
    // My CURRENT bookings
@@ -68,34 +66,6 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
       })
 
   },[])
-
-  /* ===================== load owner slots if link has owner_id ====================== */
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const ownerId = params.get("owner_id")
-
-    if (!ownerId) return
-
-    setOwnerSlots([])
-    setBookMessage("")
-    setBookError(false)
-    setOwnerSlotsLoading(true)
-    setView("book")
-
-    apiGet(`owner_booking_page.php?owner_id=${ownerId}`)
-      .then(data => {
-        setSelectedOwner(data.owner)
-        setOwnerSlots(data.slots || [])
-        setOwnerSlotsLoading(false)
-      })
-      .catch(err => {
-        setSelectedOwner({ name: "selected owner" })
-        setOwnerSlots([])
-        setBookMessage(err.message)
-        setBookError(true)
-        setOwnerSlotsLoading(false)
-      })
-  }, [])
 
   /* ======================== FETCH OWNERS LIST (BUT LOADED LAZY SO CHANGE IT)====================== */
   const fetchOwners = () => {
@@ -298,48 +268,44 @@ const handleLoadGroupMeeting = async () => {
     {/*LISTING TO SEE @MCGILL.CA WHO HAVE ACTIVE SLOTS
     * SELECT OWNER THEN SEE THEIR AVAILABLE SLOTS
     * AS A USER YOU CAN BOOK A SLOT
-    * 
+    *
     * SEE THE SLOTS YOU HAVE BOOKED
     * -DELETE --> SLOT OWNER RECEIVE NOTIFICATION ':mailto'
     * -> slot goes back to available
     * - MESSAGE THE OWNER OF THE SLOT
-    * 
+    *
     * Users see a dashboard listing their appointments and providing the following options:
     ▪ They can email (mailto:) the owner of a slot (selected or open slot)
     ▪ They can delete appointments.
     ▪ They can book additional appointments.
     ▪ They can logout
-    * 
-    * 
+    *
+    *
     */}
     {/* INSTEAD OF HAVING DIFFERENT PAGES WILL HAVE TABLES INSIDE OF DASHBOARD*/}
-    
-    {/* ................... TABS ..................*/}       
-    
-    <button className="dashboard-menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
-      ☰ Menu
-    </button>
-
-    <div className={`dashboard-tabs ${menuOpen ? "open" : ""}`}>
-      <button 
+   
+    {/* ................... TABS ..................*/}      
+   
+    <div className="dashboard-tabs">
+      <button
         className="appt-tab-btn"
-        onClick={() => { setView("appointments"); setMenuOpen(false) }}
+        onClick={() => setView("appointments")}
       >
         My Appointments
       </button>
-      <button 
-        className="browse-tab-btn" 
-        onClick={() => {setView("browse"); fetchOwners(); setMenuOpen(false)}}
+      <button
+        className="browse-tab-btn"
+        onClick={() => {setView("browse"); fetchOwners()}}
       >
         Browse Owners
       </button>
-      <button 
+      <button
         className='request-tab-btn'
-        onClick={() => { setView("request"); fetchRequestOwners(); setMenuOpen(false) }}
+        onClick={() => { setView("request"); fetchRequestOwners() }}
       >
         Request a Meeting
       </button>
-      <button className='submit-tab-btn' onClick={() => { setView("group_vote"); setMenuOpen(false) }}>
+      <button className='submit-tab-btn' onClick={() => setView("group_vote")}>
         Submit Availability
       </button>
     </div>
@@ -348,9 +314,9 @@ const handleLoadGroupMeeting = async () => {
     {view === "appointments" && (
       <section className='appointments-view'>
         <h2>My Appointments</h2>
-          
+         
         {/* appointment block with
-            ACTIONS: 
+            ACTIONS:
             - mailto owner of slot
             - Delete
             DETAILS: TIMES, DATE, OWNER NAME, 2 BUTTONS FROM THE ACTIONS ABOVE
@@ -364,7 +330,7 @@ const handleLoadGroupMeeting = async () => {
         {/* if no bookings found we tell student they have none */}
         {!bookingsLoading && bookings.length === 0 && (
           <p>No appointments yet.</p>
-        )} 
+        )}
 
         {/* HERE TO DISPLAY BOOKINGS AS A TABLE, WILL HAVE TO STYLE */}
         {!bookingsLoading && bookings.length > 0 && (
@@ -378,7 +344,7 @@ const handleLoadGroupMeeting = async () => {
                   <th>Date</th>
                   <th>Start</th>
                   <th>End</th>
-                  <th>Owner</th> 
+                  <th>Owner</th>
                   <th>Location</th>
                   <th>Actions</th>
                 </tr>
@@ -490,10 +456,12 @@ const handleLoadGroupMeeting = async () => {
     {/* ________________________ BOOK SLOTS ______________________ */}
     {view === "book" && selectedOwner && (
       <section className="book-view">
-        
+       
         <button onClick={() => setView("browse")}>← Back to browse</button>
-        <h2>Available slots with {selectedOwner.name}</h2>
-        
+        <h2 style={{ marginTop: "20px" }}>
+          Available slots with {selectedOwner.name}
+        </h2>
+       
         {/* fetch active slots for this owner FROM BACKEND */}
         {/* each slot: date, time, type, book button */}
 
@@ -679,7 +647,7 @@ const handleLoadGroupMeeting = async () => {
        
     </div>
   </div>
-    
+   
   )
 }
 export default DashboardPage
