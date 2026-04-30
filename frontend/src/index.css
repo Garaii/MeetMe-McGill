@@ -75,6 +75,12 @@ button {
   transition: background 0.15s, border-color 0.15s;
 }
 
+.activity-btn{
+  background: #d6b5eb;
+  border-color: #c17eca;
+  color: #474747
+}
+
 .delete-btn{
   background: #b30000;
   border-color: #b30000;
