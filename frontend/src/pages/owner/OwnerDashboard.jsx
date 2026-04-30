@@ -8,7 +8,7 @@ IKRAM: CREATED THE OWNER DASHBOARD PAGE WITH ALL NECESSARY ACTIONS REQUIRED TO T
 */ 
 // OwnerDashboard.jsx
 import { useState, useEffect } from 'react'
-import Navbar from '../../components/Navbar'
+import Navbar from '../components/Navbar'
 import {apiGet, apiPost} from '../../api'
 
 function OwnerDashboard({ user, onLogout }) {
