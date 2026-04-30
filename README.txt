@@ -3,6 +3,13 @@ AI usage:
 - Repo organization suggestions
 - 
 
+URL to the website: 
+
+Project members:
+- Mazen Asali (261133621)
+- Sarah Abou-Zahr (261073751)
+- Ikram Gara (261181806)
+
 
 + Explanation of each role 
 

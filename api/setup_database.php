@@ -27,6 +27,7 @@ try {
             is_active INTEGER NOT NULL DEFAULT 0,
             slot_type TEXT NOT NULL DEFAULT 'regular',
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            recurring_batch_id INTEGER,
             FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
         );
     ");
@@ -65,6 +66,7 @@ try {
             owner_id INTEGER NOT NULL,
             title TEXT NOT NULL,
             description TEXT,
+            location TEXT,
             status TEXT NOT NULL DEFAULT 'open',
             finalized_option_id INTEGER,
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -100,8 +102,24 @@ try {
             owner_id INTEGER NOT NULL,
             title TEXT NOT NULL,
             weeks INTEGER NOT NULL,
+            location TEXT,
+            is_active INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+    ");
+
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS group_attendees (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            group_id INTEGER NOT NULL,
+            slot_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(group_id, user_id),
+            FOREIGN KEY (group_id) REFERENCES group_meetings(id) ON DELETE CASCADE,
+            FOREIGN KEY (slot_id) REFERENCES slots(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
     ");
 
