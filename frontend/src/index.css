@@ -75,11 +75,6 @@ button {
   transition: background 0.15s, border-color 0.15s;
 }
 
-.cancel-btn{
-  background: #b30000;
-  border-color: #b30000;
-}
-
 .delete-btn{
   background: #b30000;
   border-color: #b30000;
@@ -100,13 +95,13 @@ button:hover {
   border-color: #d1d5db;
 }
 
-.btn-primary {
+.btn-primary, .cancel-btn {
   background: var(--accent);
   color: #fff;
   border-color: var(--accent);
 }
 
-.btn-primary:hover {
+.btn-primary:hover, .cancel-btn:hover {
   background: #b30000;
   border-color: #b30000;
 }
