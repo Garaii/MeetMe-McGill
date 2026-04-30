@@ -355,7 +355,7 @@ const handleLoadGroupMeeting = async () => {
 
                     <td>
                       <a href={`mailto:${booking.owner_email}`}>
-                        <button>Email Owner</button>
+                        <button className='email-btn'>Email Owner</button>
                       </a>
                       {(booking.can_cancel !== 0 && booking.can_cancel !== "0") && (
                         <button className='cancel-btn' onClick={()=> handleCancelBooking(booking)}>
@@ -390,7 +390,7 @@ const handleLoadGroupMeeting = async () => {
                   <td>{booking.owner_name}</td>
                   <td>{booking.location || "Not specified"}</td>
                   <td>
-                    <a href={`mailto:${booking.owner_email}`}><button>Email Owner</button></a>
+                    <a href={`mailto:${booking.owner_email}`}><button className='email-btn'>Email Owner</button></a>
                     {(booking.can_cancel !== 0 && booking.can_cancel !== "0") ? (
                       <button className='cancel-btn' onClick={() => handleCancelBooking(booking)}>Cancel</button>
                     ) : (
