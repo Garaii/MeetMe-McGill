@@ -45,6 +45,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ], 400);
     }
 
+    if ((int)$owner_id === (int)$user_id) {
+        // stop users from requesting a meeting with themselves
+        $error = "You cannot request a meeting with yourself.";
+
+        send_json([
+            "success" => false,
+            "message" => $error
+        ], 400);
+    }
+
     $requested_start = $suggested_date . " " . $start_time . ":00";
     $requested_end = $suggested_date . " " . $end_time . ":00";
     // combine date and time for SQLite
