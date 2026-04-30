@@ -124,7 +124,7 @@ function RegisterPage({onRegistered, onGoLogin}) {
               />
             </div>
 
-            {message !== "" && <p className="form-message">{message}</p>}
+            {message !== "" && <p className="auth-error">{message}</p>}
 
             <button
               className="btn-primary btn-full"

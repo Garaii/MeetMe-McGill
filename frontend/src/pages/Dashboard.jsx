@@ -21,6 +21,7 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
   const [ownerSlots, setOwnerSlots] = useState([])
   const [ownerSlotsLoading, setOwnerSlotsLoading] = useState(false)
   const [bookMessage, setBookMessage] = useState("")
+  const [bookError, setBookError] = useState(false)
 
   //REQUEST MEETING
   const [requestOwners, setRequestOwners] = useState([])
@@ -93,6 +94,7 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
     setSelectedOwner(owner)
     setOwnerSlots([])
     setBookMessage("")
+    setBookError(false)
     setOwnerSlotsLoading(true)
     setView("book")
 
@@ -110,16 +112,19 @@ function DashboardPage({user, onLogout /*, onBook*/}) {
 
   const handleBookSlot = async (slot_id) => {
     setBookMessage("")
+    setBookError(false)
     try{
       //WILL HAVE TO CHANGE NAME WHEN PHP FINISH
       await apiPost("book_slot.php", {slot_id})
       setBookMessage("Slot booked sucessfully!")
+      setBookError(false)
       setOwnerSlots(prev => prev.filter (s => s.id !== slot_id))
 
       //making sure to update the bookings list
       apiGet("dashboard.php").then( d => setBookings(d.user_bookings || []))
     } catch (err) {
       setBookMessage(err.message)
+      setBookError(true)
     }
   }
 
@@ -451,7 +456,7 @@ const handleLoadGroupMeeting = async () => {
         {/* fetch active slots for this owner FROM BACKEND */}
         {/* each slot: date, time, type, book button */}
 
-        {bookMessage && <p className='form-message'>{bookMessage}</p>}
+        {bookMessage && <p className={bookError ? 'auth-error' : 'form-message'}>{bookMessage}</p>}
         {ownerSlotsLoading && <p>Loading slots...</p>}
 
         {!ownerSlotsLoading && ownerSlots.length === 0 && (

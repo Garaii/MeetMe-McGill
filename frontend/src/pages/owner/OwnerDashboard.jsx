@@ -43,6 +43,7 @@ function OwnerDashboard({ user, onLogout }) {
   const [groupAttendees, setGroupAttendees] = useState([])
   const [votesLoading, setVotesLoading] = useState(false)
   const [finalizeMessage, setFinalizeMessage] = useState('')
+  const [finalizeError, setFinalizeError] = useState(false)
 
   // INVITATION URL STATE
   const [inviteUrl, setInviteUrl] = useState('')
@@ -344,6 +345,7 @@ function OwnerDashboard({ user, onLogout }) {
     setMeetingVotes([])
     setGroupAttendees([])
     setFinalizeMessage('')
+    setFinalizeError(false)
     setVotesLoading(true)
     setView("view_votes")
 
@@ -353,6 +355,7 @@ function OwnerDashboard({ user, onLogout }) {
       setGroupAttendees(data.attendees || [])
     } catch (err) {
       setFinalizeMessage(err.message)
+      setFinalizeError(true)
     } finally {
       setVotesLoading(false)
     }
@@ -363,10 +366,12 @@ function OwnerDashboard({ user, onLogout }) {
     if (!window.confirm('Finalize this time slot? It will be created as an active booking slot.')) return
 
     setFinalizeMessage('')
+    setFinalizeError(false)
 
     try {
       const data = await apiPost("finalize_group_meeting.php", { option_id })
       setFinalizeMessage(data.message)
+      setFinalizeError(false)
 
       apiGet("owner_slots.php").then(d => setSlots(d.slots || []))
       fetchGroupMeetings()
@@ -382,6 +387,7 @@ function OwnerDashboard({ user, onLogout }) {
       
     } catch (err) {
       setFinalizeMessage(err.message)
+      setFinalizeError(true)
     }
   }
   /* ++++++++++++++++++----------------GROUPING SLOTS ---------------+++++++++++++ */
@@ -892,7 +898,7 @@ function OwnerDashboard({ user, onLogout }) {
             <h2>Votes for: {selectedMeeting.title}</h2>
             <p>Location: {selectedMeeting.location || "Not specified"}</p>
 
-            {finalizeMessage && <p className="form-message">{finalizeMessage}</p>}
+            {finalizeMessage && <p className={finalizeError ? "auth-error" : "form-message"}>{finalizeMessage}</p>}
 
             {votesLoading ? (
               <p>Loading votes...</p>

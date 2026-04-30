@@ -39,6 +39,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; color: var(--text); }
   padding: 2px 24px;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
+  position: relative;
 }
 
 /*logo*/
@@ -360,34 +361,51 @@ button:hover {
 /* Dashboard tabs */
 .dashboard-tabs {
   display: flex;
-  gap: 9px;
-  margin: 20px 0;
+  gap: 16px;
+  margin: 0;
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
+  position: absolute;
+  top: 34px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: max-content;
+  max-width: calc(100vw - 260px);
 }
 
 .dashboard-tabs button {
-  font-size: 13px;
-  padding: 7px 14px;
-  gap: 30px;
+  font-size: 14px;
+  padding: 8px 10px;
+  white-space: nowrap;
+  line-height: 1;
+  background: transparent;
+  border-color: transparent;
+  border-radius: 0;
+  color: var(--text);
+  font-weight: 500;
 }
 
 .dashboard-tabs button.active,
 .appt-tab-btn,
 .browse-tab-btn,
-.request-tab-btn {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
+.request-tab-btn,
+.submit-tab-btn {
+  background: transparent;
+  color: var(--text);
+  border-color: transparent;
 }
 
 .dashboard-tabs button.active:hover,
 .appt-tab-btn:hover,
 .browse-tab-btn:hover,
 .request-tab-btn:hover, .submit-tab-btn:hover {
-  background: #ff0019;
-  border-color: #ff0b0b;
+  background: transparent;
+  border-color: transparent;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 5px;
 }
 
 /*  Dashboard sections */
