@@ -22,3 +22,4 @@ meetme-final/frontend/dist/
 .env
 .env.local
 backups/meetme-before-final-migrations.sqlite
+api/meetme.sqlite
